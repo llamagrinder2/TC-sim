@@ -1,43 +1,48 @@
 // js/unitPlacement.js
 
-// Módosult import: selectedArmyUnit és setSelectedArmyUnit hozzáadva
+// Fontos: Itt importáljuk az összes szükséges változót és függvényt a gameState.js-ből
 import { unitsData, unitsActivatedThisRound, initialUnits, unitsPlaced, incrementUnitsPlaced, selectedArmyUnit, setSelectedArmyUnit } from './gameState.js';
 import { unitInfoDiv, armyPlacementTable } from './domElements.js';
 import { startGame } from './gameFlow.js';
 
-// let _selectedArmyUnit = null; // EZT A SORT TÖRÖLD!
-
 export function selectArmyUnit(event) {
-    setSelectedArmyUnit(event.target.dataset.unit); // Használjuk a beállító függvényt
-    if (selectedArmyUnit) { // Használjuk a beimportált változót
+    // A selectedArmyUnit értékét a setSelectedArmyUnit függvényen keresztül állítjuk be
+    setSelectedArmyUnit(event.target.dataset.unit);
+    if (selectedArmyUnit) {
         unitInfoDiv.textContent = `${selectedArmyUnit} kiválasztva a seregéből. Helyezd el a táblán!`;
     }
 }
 
 export function handlePlacementClick(event) {
-    // Használjuk a beimportált selectedArmyUnit-et
+    // Ellenőrizzük, hogy van-e kiválasztott egység, és hogy a célcella üres-e
     if (selectedArmyUnit && !event.target.textContent) {
-        event.target.textContent = selectedArmyUnit;
-        unitsData[selectedArmyUnit] = { bloodMarkers: 0 };
-        unitsActivatedThisRound[selectedArmyUnit] = false;
+        event.target.textContent = selectedArmyUnit; // Elhelyezzük az egységet a cellában
+        unitsData[selectedArmyUnit] = { bloodMarkers: 0 }; // Inicializáljuk az egység adatait
+        unitsActivatedThisRound[selectedArmyUnit] = false; // Beállítjuk, hogy még nem aktiválódott a körben
 
+        // Elrejtjük a seregválasztó tábla celláját, ahonnan az egységet elvettük
         const armyCells = armyPlacementTable.querySelectorAll('.army-cell[data-unit]');
         armyCells.forEach(cell => {
-            if (cell.dataset.unit === selectedArmyUnit) { // Használjuk a beimportált selectedArmyUnit-et
+            if (cell.dataset.unit === selectedArmyUnit) {
                 cell.textContent = '';
                 cell.dataset.unit = '';
                 cell.removeEventListener('click', selectArmyUnit);
             }
         });
 
-        setSelectedArmyUnit(null); // Beállító függvény használata
-        unitInfoDiv.textContent = '';
-        unitsPlaced++; // A gameState-ben frissítjük a külső változót
+        // Visszaállítjuk a selectedArmyUnit-et null-ra, hogy ne helyezhessünk el többször ugyanazt
+        // Ezt is a beállító függvénnyel tesszük
+        setSelectedArmyUnit(null);
+        unitInfoDiv.textContent = ''; // Töröljük az információs üzenetet
 
+        // Növeljük az elhelyezett egységek számát a dedikált függvénnyel
+        incrementUnitsPlaced();
+
+        // Ellenőrizzük, hogy az összes egység el lett-e helyezve
         if (unitsPlaced === Object.keys(initialUnits).length) {
-            startGame();
+            startGame(); // Ha igen, elindítjuk a játékot
         } else if (unitsPlaced < Object.keys(initialUnits).length) {
-            unitInfoDiv.textContent = "Helyezd el a következő egységet!";
+            unitInfoDiv.textContent = "Helyezd el a következő egységet!"; // Ha nem, kérjük a következőt
         }
     }
 }
