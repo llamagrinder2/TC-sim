@@ -1,12 +1,14 @@
 // js/main.js
 
-import { gameGrid, moveButton, attackButton, endButton, armyPlacementTable } from './domElements.js';
+import { gameGrid, moveButton, attackButton, endButton, armyPlacementTable, messageDisplayDiv } from './domElements.js'; // Fontos: messageDisplayDiv hozzáadása
 import { createGrid, findUnitCell } from './grid.js';
 import { initializeArmyPlacement, handlePlacementClick } from './unitPlacement.js';
-import { handleMoveAction, selectUnit, highlightPossibleTargets, setCurrentAction, clearHighlights, updateActionButtons } from './unitActions.js';
+// A setCurrentAction kikerül innen:
+import { handleMoveAction, selectUnit, highlightPossibleTargets, clearHighlights, updateActionButtons } from './unitActions.js';
 import { handleAttackAction } from './combat.js';
 import { startGame, endActivation } from './gameFlow.js';
-import { gameStarted, currentAction, activeUnit, unitsData, unitsActivatedThisRound, setGameStarted } from './gameState.js'; // Fontosak a state-ek
+// Itt importáljuk a setCurrentAction-t a gameState.js-ből:
+import { gameStarted, currentAction, activeUnit, unitsData, unitsActivatedThisRound, setGameStarted, setSelectedUnitCell, setCurrentAction, setHasMoved, setHasAttacked } from './gameState.js';
 
 // --- Játék Inicializálás ---
 createGrid();
@@ -49,20 +51,20 @@ endButton.addEventListener('click', () => {
 
 // Fő játéktér kattintáskezelő
 function handleGameClick(event) {
-    if (!gameStarted) return;
+    if (!gameStarted) return; // gameStarted a gameState-ből
 
     let clickedCell = event.target;
     let unitName = clickedCell.textContent.replace(/\d$/, '');
 
-    if (currentAction === 'move') {
+    if (currentAction === 'move') { // currentAction a gameState-ből
         handleMoveAction(clickedCell);
-    } else if (currentAction === 'attack') {
+    } else if (currentAction === 'attack') { // currentAction a gameState-ből
         handleAttackAction(clickedCell);
     } else {
         // Csak akkor választhatunk egységet, ha még nem aktiválódott ebben a körben
-        if (unitName && unitsData[unitName] && !unitsActivatedThisRound[unitName]) {
+        if (unitName && unitsData[unitName] && !unitsActivatedThisRound[unitName]) { // unitsData, unitsActivatedThisRound a gameState-ből
             selectUnit(clickedCell);
-        } else if (selectedUnitCell && clickedCell === selectedUnitCell) {
+        } else if (selectedUnitCell && clickedCell === selectedUnitCell) { // selectedUnitCell a gameState-ből
             clearSelection();
         }
     }
