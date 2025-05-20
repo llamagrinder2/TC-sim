@@ -27,3 +27,4 @@ export function resetUnitsActivatedThisRound() {
         unitsActivatedThisRound[unit] = false;
     }
 }
+export function setSelectedArmyUnit(unit) { selectedArmyUnit = unit; } // ÚJ: Beállító függvény
