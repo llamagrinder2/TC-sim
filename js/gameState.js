@@ -28,3 +28,21 @@ export function resetUnitsActivatedThisRound() {
     }
 }
 export function setSelectedArmyUnit(unit) { selectedArmyUnit = unit; } // ÚJ: Beállító függvény
+
+// ÚJ: Frakció beállító függvények
+export function setPlayer1Faction(faction) { player1Faction = faction; }
+export function setPlayer2Faction(faction) { player2Faction = faction; }
+
+// ÚJ: InitialUnits inicializálása a választott frakciók alapján
+export function initializeInitialUnits(faction1, faction2) {
+    if (faction1) {
+        // ideiglenes megoldás, amíg nem lesznek egyedi egységek
+        initialUnits['TP1'] = { type: 'TP', player: 1 };
+        initialUnits['HT1'] = { type: 'HT', player: 1 };
+    }
+    if (faction2) {
+        // ideiglenes megoldás, amíg nem lesznek egyedi egységek
+        initialUnits['TP2'] = { type: 'TP', player: 2 };
+        initialUnits['HT2'] = { type: 'HT', player: 2 };
+    }
+}
