@@ -12,7 +12,7 @@ import { gameStarted, currentAction, activeUnit, unitsData, unitsActivatedThisRo
 
 // --- Játék Inicializálás ---
 createGrid();
-initializeArmyPlacement();
+// initializeArmyPlacement(); háthakell
 
 // --- Eseménykezelők ---
 
