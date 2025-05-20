@@ -2,7 +2,7 @@
 
 import { gameGrid, moveButton, attackButton, endButton, armyPlacementTable, messageDisplayDiv } from './domElements.js'; // Fontos: messageDisplayDiv hozzáadása
 import { createGrid, findUnitCell } from './grid.js';
-import { initializeArmyPlacement, handlePlacementClick } from './unitPlacement.js';
+import { initializeUnitPlacementForPlayer, handlePlacementClick } from './unitPlacement.js';
 // A setCurrentAction kikerül innen:
 import { handleMoveAction, selectUnit, highlightPossibleTargets, clearHighlights, updateActionButtons } from './unitActions.js';
 import { handleAttackAction } from './combat.js';
