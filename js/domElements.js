@@ -18,3 +18,4 @@ export const player2FactionNameH2 = document.getElementById('player2FactionName'
 export const selectFaction1Btn = document.getElementById('selectFaction1Btn');
 export const selectFaction2Btn = document.getElementById('selectFaction2Btn');
 export const factionSelectionDiv = document.querySelector('.faction-selection'); // Az egész szekció
+export const factionButtonsContainer = document.getElementById('factionButtonsContainer'); // <<< ÚJ
