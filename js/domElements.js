@@ -12,3 +12,9 @@ export const dice2Div = document.getElementById('dice2');
 export const bonusDiceContainer = document.getElementById('bonusDiceContainer');
 export const armyPlacementTable = document.getElementById('armyPlacement');
 export const messageDisplayDiv = document.getElementById('messageDisplay');
+
+export const player1FactionNameH2 = document.getElementById('player1FactionName');
+export const player2FactionNameH2 = document.getElementById('player2FactionName');
+export const selectFaction1Btn = document.getElementById('selectFaction1Btn');
+export const selectFaction2Btn = document.getElementById('selectFaction2Btn');
+export const factionSelectionDiv = document.querySelector('.faction-selection'); // Az egész szekció
