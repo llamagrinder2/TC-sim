@@ -1,0 +1,95 @@
+body {
+  display: flex;
+  align-items: flex-start;
+}
+
+table {
+  border-collapse: collapse;
+  margin-right: 20px;
+}
+
+td {
+  border: 1px solid black;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.highlighted-move {
+  background-color: lightgreen;
+}
+
+.highlighted-attack {
+  background-color: lightcoral;
+}
+
+.activated {
+  color: lightgray;
+}
+
+#sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+#unitInfo {
+  margin-bottom: 10px;
+}
+
+#messageDisplay { /* Ezt illeszd be! */
+  margin-bottom: 15px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  min-height: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#actionButtons {
+  display: none;
+  margin-bottom: 10px;
+}
+
+#actionButtons button {
+  margin-bottom: 5px;
+}
+
+#diceRolls {
+  display: flex;
+  margin-top: 20px;
+}
+
+#bonusDiceContainer { /* ÚJ STÍLUS */
+  display: flex; /* Alapból flex, de üres lesz */
+  margin-top: 5px;
+  min-height: 60px; /* Hogy ne ugorjon a layout, ha megjelenik */
+}
+
+.dice {
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  font-size: 40px;
+  margin-right: 5px;
+}
+#roundCounter {
+  border: 1px solid black;
+  padding: 10px;
+  margin-top: 20px;
+  text-align: center;
+  display: none; /* Kezdetben rejtett */
+}
+
+.army-cell {
+  border: 1px solid gray;
+}
+
+.army-row td {
+  padding: 5px;
+}

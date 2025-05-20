@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Trench Crusade Egyszerű Grid</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<table id="gameGrid">
+</table>
+
+<div id="sidebar">
+  <div id="messageDisplay"></div>
+  <div id="unitInfo"></div>
+  <div id="actionButtons">
+    <button id="moveButton">Mozgás</button>
+    <button id="attackButton">Támadás</button>
+  </div>
+  <button id="endButton" style="display: none;">End</button>
+  <div id="diceRolls">
+    <div id="dice1" class="dice"></div>
+    <div id="dice2" class="dice"></div>
+  </div>
+  <div id="bonusDiceContainer"></div>
+  <div id="roundCounter">Kör: 1 / 4</div>
+</div>
+
+<div>
+  <table id="armyPlacement">
+    <tr class="army-row">
+      <td>Sereg 1:</td>
+      <td class="army-cell" data-unit="TP">TP</td>
+      <td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td>
+      <td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td>
+    </tr>
+    <tr class="army-row">
+      <td>Sereg 2:</td>
+      <td class="army-cell" data-unit="HT">HT</td>
+      <td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td>
+      <td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td>
+    </tr>
+  </table>
+</div>
+
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>
