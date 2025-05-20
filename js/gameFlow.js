@@ -1,9 +1,10 @@
 // js/gameFlow.js
 
 import { roundCounterDiv, messageDisplayDiv, moveButton, attackButton, endButton } from './domElements.js';
-import { unitsData, unitsActivatedThisRound, currentRound, totalRounds, gameStarted, activeUnit, incrementRound, resetUnitsActivatedThisRound, setGameStarted } from './gameState.js';
+import { unitsData, unitsActivatedThisRound, currentRound, gameStarted, activeUnit, incrementRound, resetUnitsActivatedThisRound, setGameStarted } from './gameState.js'; // totalRounds eltávolítva innen
 import { findUnitCell } from './grid.js';
 import { clearSelection } from './unitActions.js';
+import { totalRounds } from './constants.js'; // totalRounds importálása innen
 
 export function startGame() {
   console.log("startGame() lefutott!");
