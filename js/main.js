@@ -1,106 +1,98 @@
 // js/main.js
 
-import { gameGrid, moveButton, attackButton, endButton, armyPlacementTable, messageDisplayDiv } from './domElements.js'; // Fontos: messageDisplayDiv hozzáadása
-import { createGrid, findUnitCell } from './grid.js';
-import { initializeUnitPlacementForPlayer, handlePlacementClick } from './unitPlacement.js';
-// A setCurrentAction kikerül innen:
+import { gameGrid, moveButton, attackButton, endButton, messageDisplayDiv, player1FactionNameH2, player2FactionNameH2, selectFaction1Btn, selectFaction2Btn, factionSelectionDiv, actionButtonsDiv, unitInfoDiv, dice1Div, dice2Div, bonusDiceContainer, roundCounterDiv } from './domElements.js';
+import { createGrid } from './grid.js';
+import { handlePlacementClick, initializeUnitPlacementForPlayer } from './unitPlacement.js';
 import { handleMoveAction, selectUnit, highlightPossibleTargets, clearHighlights, updateActionButtons } from './unitActions.js';
 import { handleAttackAction } from './combat.js';
 import { startGame, endActivation } from './gameFlow.js';
-// Itt importáljuk a setCurrentAction-t a gameState.js-ből:
-import { gameStarted, currentAction, activeUnit, unitsData, unitsActivatedThisRound, setGameStarted, setSelectedUnitCell, setCurrentAction, setHasMoved, setHasAttacked } from './gameState.js';
-import { factionNames } from './factions.js'; // <<< Ennek így kell lennie!
+import { gameStarted, currentAction, activeUnit, unitsData, unitsActivatedThisRound, setGameStarted, setSelectedUnitCell, setCurrentAction, setHasMoved, setHasAttacked, setPlayer1Faction, setPlayer2Faction, player1Faction, player2Faction, initializeInitialUnits } from './gameState.js';
+import { factionNames } from './factions.js';
 
-// --- Játék Inicializálás ---
-createGrid();
-// initializeArmyPlacement(); háthakell
 
-// --- Eseménykezelők ---
+// Globális változók a játékosok frakcióválasztásának nyomon követésére
+let player1FactionSelected = false;
+let player2FactionSelected = false;
 
-// Az armyPlacementTable elrejtése a startGame-ben történik, de a kezelőt itt távolítjuk el
-// (handlePlacementClick)
-// Itt inicializáljuk a gameGrid eseménykezelőjét
-for (let i = 0; i < gameGrid.rows.length; i++) {
-    for (let j = 0; j < gameGrid.rows[i].cells.length; j++) {
-        gameGrid.rows[i].cells[j].addEventListener('click', handleGameClick);
-    }
-}
 
-moveButton.addEventListener('click', () => {
-    if (gameStarted && activeUnit && !unitsActivatedThisRound[activeUnit.textContent.replace(/\d$/, '')]) { // Frissített ellenőrzés
-        setCurrentAction('move');
-        clearHighlights();
-        highlightPossibleTargets('move', activeUnit);
-        messageDisplayDiv.textContent = "";
-    }
-});
-
-attackButton.addEventListener('click', () => {
-    if (gameStarted && activeUnit && !unitsActivatedThisRound[activeUnit.textContent.replace(/\d$/, '')]) { // Frissített ellenőrzés
-        setCurrentAction('attack');
-        clearHighlights();
-        highlightPossibleTargets('attack', activeUnit);
-        messageDisplayDiv.textContent = "Válaszd ki a célpontot a támadáshoz!";
-    }
-});
-
-endButton.addEventListener('click', () => {
-    if (gameStarted && activeUnit) {
-        endActivation();
-    }
-});
-
-// Fő játéktér kattintáskezelő
 function handleGameClick(event) {
     if (!gameStarted) return; // gameStarted a gameState-ből
 
     let clickedCell = event.target;
+    // Ellenőrizzük, hogy tényleg egy cellára kattintottunk-e és van-e rajta egység
+    if (!clickedCell.classList.contains('grid-cell')) {
+        return;
+    }
+
     let unitName = clickedCell.textContent.replace(/\d$/, '');
 
-    if (currentAction === 'move') { // currentAction a gameState-ből
+    if (currentAction === 'move') {
         handleMoveAction(clickedCell);
-    } else if (currentAction === 'attack') { // currentAction a gameState-ből
+    } else if (currentAction === 'attack') {
         handleAttackAction(clickedCell);
     } else {
         // Csak akkor választhatunk egységet, ha még nem aktiválódott ebben a körben
-        if (unitName && unitsData[unitName] && !unitsActivatedThisRound[unitName]) { // unitsData, unitsActivatedThisRound a gameState-ből
+        // és az egység az aktuális játékoshoz tartozik
+        if (unitName && unitsData[unitName] && !unitsActivatedThisRound[unitName] && clickedCell.dataset.player == getActivePlayer()) {
             selectUnit(clickedCell);
-        } else if (selectedUnitCell && clickedCell === selectedUnitCell) { // selectedUnitCell a gameState-ből
+        } else if (selectedUnitCell && clickedCell === selectedUnitCell) {
             clearSelection();
         }
     }
 }
 
-// Az startGame függvényt felülírjuk itt a fő logikához, ami a DOM-ot érinti
-// Ez az a startGame, ami a unitPlacement-ből hívódik, miután elhelyeztük az összes egységet.
-window.startGame = () => {
-    console.log("main.js startGame() lefutott!");
-    setGameStarted(true);
-    roundCounterDiv.style.display = 'block';
-    armyPlacementTable.style.display = 'none'; // Elrejtjük az egységelhelyező táblát
-    messageDisplayDiv.textContent = "A játék elkezdődött!";
+// Segédfüggvény az aktív játékos lekéréséhez (ha még nincs gameState-ben)
+// Ezt később érdemes a gameState-be helyezni, ha játékosváltás is lesz.
+function getActivePlayer() {
+    // Ezt a gameFlow.js-ből kellene exportálni, ha van már olyan változója.
+    // Jelenleg feltételezzük, hogy az 1. játékos kezdi a játékot, amíg nincs meg a játékosváltás logikája.
+    return 1;
+}
 
-    // A gameGrid eseménykezelőit már a fájl elején beállítjuk, így nem kell itt újra
-    // Bár érdemes lenne itt *lecserélni* a handlePlacementClick-ről a handleGameClick-re.
-    // Most a legegyszerűbb, ha a handleGameClick a belső logikájában ellenőrzi, hogy gameStarted.
-    // Jelenleg mindkét listener rajta van, de a handlePlacementClick csak akkor működik, ha selectedArmyUnit van.
-    // Ha gameStarted=true, selectedArmyUnit=null, akkor nem fog lefutni a handlePlacementClick.
-    // Ez a megoldás most elegendő, de egy komplexebb rendszerben valószínűleg lecserélnénk az eventListenereket.
-};
 
-// Az endGame függvényt is exportáljuk a gameFlow-ból, de ideiglenesen felülírjuk a main.js-ben a grid eseménykezelőjének eltávolítására
-window.endGame = (message) => { // window-ra tesszük, hogy hívható legyen, ha a gameFlow nem importálja
-    alert(message);
-    messageDisplayDiv.textContent = message;
-    moveButton.disabled = true;
-    attackButton.disabled = true;
-    endButton.disabled = true;
-    setGameStarted(false);
+// Eseménykezelők a frakcióválasztó gombokhoz
+selectFaction1Btn.addEventListener('click', () => selectFaction(1));
+selectFaction2Btn.addEventListener('click', () => selectFaction(2));
 
-    // Eltávolítjuk a játék eseménykezelőjét a gameGrid-ről
-    for (let i = 0; i < gameGrid.rows.length; i++) {
-        for (let j = 0; j < gameGrid.rows[i].cells.length; j++) {
-            gameGrid.rows[i].cells[j].removeEventListener('click', handleGameClick);
+function selectFaction(playerNum) {
+    let factionChoice = prompt(`Játékos ${playerNum}, válassz frakciót a következők közül:\n${factionNames.join(', ')}`);
+    if (factionChoice && factionNames.includes(factionChoice)) {
+        if (playerNum === 1) {
+            setPlayer1Faction(factionChoice);
+            player1FactionNameH2.textContent = factionChoice;
+            player1FactionSelected = true;
+        } else {
+            setPlayer2Faction(factionChoice);
+            player2FactionNameH2.textContent = factionChoice;
+            player2FactionSelected = true;
         }
+        messageDisplayDiv.textContent = `Játékos ${playerNum} a ${factionChoice} frakciót választotta.`;
+
+        // Ha mindkét frakció kiválasztva, indítsuk az egység elhelyezést
+        if (player1FactionSelected && player2FactionSelected) {
+            messageDisplayDiv.textContent = "Minden frakció kiválasztva. Helyezd el az egységeket!";
+            factionSelectionDiv.style.display = 'none'; // Elrejtjük a frakcióválasztó UI-t
+            gameGrid.style.display = 'grid'; // Megjelenítjük a gridet (a grid.js hozza létre a div-eket)
+            
+            // Játékhoz szükséges UI elemek inicializálása (ezeket a startGame() fogja bekapcsolni)
+            // Itt csak a roundCounterDiv-et tesszük láthatóvá, amíg a játék nem indul el teljesen
+            roundCounterDiv.style.display = 'block';
+
+            // Itt inicializáljuk az initialUnits-ot a választott frakciók alapján
+            initializeInitialUnits(player1Faction, player2Faction);
+
+            // Indítjuk az egység elhelyezést az 1. játékos számára
+            initializeUnitPlacementForPlayer(1);
+        }
+    } else {
+        alert("Érvénytelen frakció választás. Kérlek, válassz a listából.");
     }
-};
+}
+
+
+// Kezdeti inicializálás
+createGrid(); // Létrehozza a rácsot (most már DIV-ekből)
+gameGrid.addEventListener('click', handleGameClick);
+
+// A játék indulását most már a frakcióválasztás és egységelhelyezés vezérli.
+// Az initializeArmyPlacement() függvényre már nincs szükség, töröltük.
