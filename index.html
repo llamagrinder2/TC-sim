@@ -1,48 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="hu">
 <head>
-<title>Trench Crusade Egyszerű Grid</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trench Crusade Tactics</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <h1>Trench Crusade Tactics</h1>
 
-<table id="gameGrid">
-</table>
+    <div class="game-container">
+        <div id="gameGrid" class="grid-container"></div>
 
-<div id="sidebar">
-  <div id="messageDisplay"></div>
-  <div id="unitInfo"></div>
-  <div id="actionButtons">
-    <button id="moveButton">Mozgás</button>
-    <button id="attackButton">Támadás</button>
-  </div>
-  <button id="endButton" style="display: none;">End</button>
-  <div id="diceRolls">
-    <div id="dice1" class="dice"></div>
-    <div id="dice2" class="dice"></div>
-  </div>
-  <div id="bonusDiceContainer"></div>
-  <div id="roundCounter">Kör: 1 / 4</div>
-</div>
+        <div class="control-panel">
+            <div id="messageDisplay" class="message-display">Üdv a Trench Crusade Tacticsben! Helyezd el az egységeidet!</div>
+            <div id="unitInfo" class="unit-info"></div>
 
-<div>
-  <table id="armyPlacement">
-    <tr class="army-row">
-      <td>Sereg 1:</td>
-      <td class="army-cell" data-unit="TP">TP</td>
-      <td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td>
-      <td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td>
-    </tr>
-    <tr class="army-row">
-      <td>Sereg 2:</td>
-      <td class="army-cell" data-unit="HT">HT</td>
-      <td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td>
-      <td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td><td class="army-cell"></td>
-    </tr>
-  </table>
-</div>
+            <div class="faction-selection">
+                <div class="player-faction">
+                    <h2 id="player1FactionName">Csapat 1</h2>
+                    <button id="selectFaction1Btn">Válassz frakciót</button>
+                </div>
+                <div class="player-faction">
+                    <h2 id="player2FactionName">Csapat 2</h2>
+                    <button id="selectFaction2Btn">Válassz frakciót</button>
+                </div>
+            </div>
+            <div id="actionButtons" class="action-buttons">
+                <button id="moveButton" class="action-button">Mozgás</button>
+                <button id="attackButton" class="action-button">Támadás</button>
+            </div>
+            <button id="endButton" class="action-button end-turn-button">Kör vége</button>
+            <div class="dice-display">
+                <div id="dice1" class="dice"></div>
+                <div id="dice2" class="dice"></div>
+                <div id="bonusDiceContainer" class="bonus-dice-container"></div>
+            </div>
+        </div>
+    </div>
 
-<script type="module" src="js/main.js"></script>
-
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
