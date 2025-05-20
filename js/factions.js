@@ -2,8 +2,7 @@
 
 export const FACTIONS = {
     'Heretic Legion': {
-        units: ['TP', 'HT'], // Példa: Minden frakciónak van egy TP és HT egysége
-        // Később itt lehetnek egyedi egységnevek, képességek, stb.
+        units: ['TP', 'HT'],
     },
     'Trench Pilgrims': {
         units: ['TP', 'HT'],
@@ -22,4 +21,4 @@ export const FACTIONS = {
     },
 };
 
-export const factionNames = Object.keys(FACTIONS);
+export const factionNames = Object.keys(FACTIONS); // <<< Ennek így kell lennie!
