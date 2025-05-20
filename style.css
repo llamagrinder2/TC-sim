@@ -86,10 +86,49 @@ td {
   display: none; /* Kezdetben rejtett */
 }
 
-.army-cell {
-  border: 1px solid gray;
+/* Faction Selection Styles */
+.faction-selection {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #333;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-.army-row td {
-  padding: 5px;
+.player-faction {
+    text-align: center;
+    margin: 10px;
+    color: #eee;
+}
+
+.player-faction h2 {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.faction-selection button {
+    background-color: #555;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+.faction-selection button:hover {
+    background-color: #777;
+}
+
+/* Rejtett elemek alapértelmezett beállítása, amíg nem választunk frakciót */
+.grid-container,
+.action-buttons,
+.end-turn-button,
+.dice-display,
+.unit-info {
+    display: none;
 }
