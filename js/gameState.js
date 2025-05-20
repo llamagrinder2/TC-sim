@@ -11,6 +11,7 @@ export let activeUnit = null; // Aktuálisan aktivált egység div-je
 export let hasMoved = false; // Aktív egység mozgott-e már
 export let hasAttacked = false; // Aktív egység támadott-e már
 export let unitsPlaced = 0; // Hány egység lett elhelyezve
+export let selectedArmyUnit = null;
 
 // Függvények az állapotváltozók frissítésére (ha szükséges)
 export function setGameStarted(value) { gameStarted = value; }
