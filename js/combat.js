@@ -2,7 +2,8 @@
 
 import { diceChars } from './constants.js';
 import { dice1Div, dice2Div, bonusDiceContainer, messageDisplayDiv, gameGrid } from './domElements.js';
-import { unitsData, unitsActivatedThisRound, activeUnit, currentAction, setHasAttacked, setCurrentAction } from './gameState.js';
+// Itt importáljuk a 'gameStarted' változót a gameState.js-ből
+import { unitsData, unitsActivatedThisRound, activeUnit, currentAction, setHasAttacked, setCurrentAction, gameStarted } from './gameState.js';
 import { clearHighlights } from './unitActions.js';
 import { endActivation } from './gameFlow.js';
 
@@ -18,12 +19,14 @@ function createBonusDiceElements(count) {
 }
 
 export function handleAttackAction(targetCell) {
+    // Ellenőrizzük, hogy a játék elkezdődött-e, van-e aktív egység,
+    // és hogy a célcella támadható-e
     if (gameStarted && activeUnit && targetCell.classList.contains('highlighted-attack') && targetCell.textContent && targetCell !== activeUnit) {
         const attackerName = activeUnit.textContent.replace(/\d$/, '');
         let defenderName = targetCell.textContent.replace(/\d$/, '');
         const defenderCell = targetCell;
 
-        // Előkészítjük a kockákat
+        // Előkészítjük a kockák kijelzőjét
         dice1Div.textContent = '';
         dice2Div.textContent = '';
         bonusDiceContainer.innerHTML = '';
@@ -43,13 +46,11 @@ export function handleAttackAction(targetCell) {
                 const totalHitRoll = roll1 + roll2;
                 messageDisplayDiv.textContent = `Második találati dobás: ${roll2}. Összesen: ${totalHitRoll}!`;
 
-                // Találat ellenőrzése 1 másodperc késleltetés után
+                // Találat ellenőrzése
                 setTimeout(() => {
                     if (totalHitRoll >= 7) {
                         messageDisplayDiv.textContent = `TALÁLAT! (${totalHitRoll}). Most jön a sebzés dobás!`;
-                        // Ha sikeres a találat, akkor hívjuk meg a sebzés dobást
-                        // Az extra kockák kérdését a performDamageRoll kezeli
-                        // Várjunk egy pillanatot, mielőtt a sebzésfázis indul
+                        // Ha sikeres a találat, akkor a sebzésfázis indul
                         setTimeout(() => {
                             const defenderBloodMarkers = unitsData[defenderName] ? unitsData[defenderName].bloodMarkers : 0;
                             if (defenderBloodMarkers > 0) {
