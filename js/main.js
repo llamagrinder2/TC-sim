@@ -9,6 +9,7 @@ import { handleAttackAction } from './combat.js';
 import { startGame, endActivation } from './gameFlow.js';
 // Itt importáljuk a setCurrentAction-t a gameState.js-ből:
 import { gameStarted, currentAction, activeUnit, unitsData, unitsActivatedThisRound, setGameStarted, setSelectedUnitCell, setCurrentAction, setHasMoved, setHasAttacked } from './gameState.js';
+import { factionNames } from './factions.js'; // <<< Ennek így kell lennie!
 
 // --- Játék Inicializálás ---
 createGrid();
