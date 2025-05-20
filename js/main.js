@@ -6,7 +6,7 @@ import { handlePlacementClick, initializeUnitPlacementForPlayer } from './unitPl
 import { handleMoveAction, selectUnit, highlightPossibleTargets, clearHighlights, updateActionButtons } from './unitActions.js';
 import { handleAttackAction } from './combat.js';
 import { startGame, endActivation } from './gameFlow.js';
-import { gameStarted, currentAction, activeUnit, unitsData, unitsActivatedThisRound, setGameStarted, setSelectedUnitCell, setCurrentAction, setHasMoved, setHasAttacked, setPlayer1Faction, setPlayer2Faction, player1Faction, player2Faction, initializeInitialUnits } from './gameState.js';
+import { gameStarted, selectedUnitCell, currentAction, activeUnit, unitsData, unitsActivatedThisRound, setGameStarted, setSelectedUnitCell, setCurrentAction, setHasMoved, setHasAttacked, setPlayer1Faction, setPlayer2Faction, player1Faction, player2Faction, initializeInitialUnits } from './gameState.js'; // <<< EZ A MÓDOSÍTOTT SOR!
 import { factionNames } from './factions.js';
 
 
