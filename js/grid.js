@@ -1,28 +1,29 @@
 // js/grid.js
 
-import { gridSize } from './constants.js';
 import { gameGrid } from './domElements.js';
-import { handlePlacementClick } from './unitPlacement.js'; // Fontos: a handlePlacementClick itt kell
+import { gridSize } from './constants.js';
 
 export function createGrid() {
-  for (let i = 0; i < gridSize; i++) {
-    let row = gameGrid.insertRow();
-    for (let j = 0; j < gridSize; j++) {
-      let cell = row.insertCell();
-      cell.dataset.row = i;
-      cell.dataset.col = j;
-      cell.addEventListener('click', handlePlacementClick);
+    gameGrid.innerHTML = ''; // Töröljük a korábbi tartalmat, ha volt
+    gameGrid.style.gridTemplateColumns = `repeat(${gridSize}, 50px)`; // Feltételezzük, hogy a .grid-container display: grid;
+
+    for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+            const cell = document.createElement('div');
+            cell.classList.add('grid-cell');
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            gameGrid.appendChild(cell);
+        }
     }
-  }
 }
 
 export function findUnitCell(unitName) {
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
-      if (gameGrid.rows[i].cells[j].textContent.startsWith(unitName)) {
-        return gameGrid.rows[i].cells[j];
-      }
+    const cells = gameGrid.querySelectorAll('.grid-cell'); // Módosított
+    for (let cell of cells) {
+        if (cell.textContent === unitName) {
+            return cell;
+        }
     }
-  }
-  return null;
+    return null;
 }
