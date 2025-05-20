@@ -1,7 +1,7 @@
 // js/unitActions.js
 
 import { gameGrid, unitInfoDiv, actionButtonsDiv, endButton, dice1Div, dice2Div, bonusDiceContainer, messageDisplayDiv, moveButton, attackButton } from './domElements.js';
-import { unitsData, unitsActivatedThisRound, activeUnit, hasMoved, hasAttacked, currentAction, setHasMoved, setHasAttacked, setCurrentAction, setActiveUnit, setSelectedUnitCell } from './gameState.js';
+import { unitsData, unitsActivatedThisRound, activeUnit, hasMoved, hasAttacked, currentAction, setHasMoved, setHasAttacked, setCurrentAction, setActiveUnit, setSelectedUnitCell, gameStarted } from './gameState.js';
 import { endActivation } from './gameFlow.js';
 import { handleAttackAction } from './combat.js'; // Módosítás: a támadáslogika külön fájlba került
 import { gridSize } from './constants.js';
