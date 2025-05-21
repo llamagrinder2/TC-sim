@@ -8,8 +8,8 @@ export const messageDisplayDiv = document.getElementById('messageDisplay');
 
 // Frakcióválasztó panel elemei
 export const factionSelectionPanel = document.getElementById('factionSelectionPanel'); // Feltételezve, hogy van ilyen
-export const selectFaction1Btn = document.getElementById('selectFaction1Btn');
-export const selectFaction2Btn = document.getElementById('selectFaction2Btn');
+export const player1FactionSelectBtn = document.getElementById('selectFaction1Btn');
+export const player2FactionSelectBtn = document.getElementById('selectFaction2Btn');
 export const factionButtonsContainer = document.getElementById('factionButtonsContainer');
 
 // Egységválasztó panel elemei
