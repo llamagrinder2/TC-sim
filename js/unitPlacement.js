@@ -97,7 +97,7 @@ export function highlightPlacementZones() {
         const row = parseInt(cell.dataset.row); // Kinyerjük a sor számát
         // Ellenőrizzük, hogy a cella a kezdőzónában van-e, ÉS üres-e (nincs rajta egység)
         if (row >= startRow && row <= endRow && !cell.dataset.unit) {
-            cell.classList.add('highlight-placement'); // Kiemeljük a cellát (ez a CSS osztály valószínűleg zöldre színezi)
+            cell.classList.add('highlighted-placement'); // Kiemeljük a cellát (ez a CSS osztály valószínűleg zöldre színezi)
         }
     });
 }
