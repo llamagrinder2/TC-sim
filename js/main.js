@@ -1,26 +1,26 @@
 // js/main.js
 
-import { gameGrid, moveButton, attackButton, endButton, messageDisplayDiv, player1FactionNameH2, player2FactionNameH2, selectFaction1Btn, selectFaction2Btn, factionSelectionDiv, actionButtonsDiv, unitInfoDiv, dice1Div, dice2Div, bonusDiceContainer, roundCounterDiv, factionButtonsContainer } from './domElements.js'; // <<< factionButtonsContainer hozzáadva
+import { gameGrid, moveButton, attackButton, endButton, messageDisplayDiv, player1FactionNameH2, player2FactionNameH2, selectFaction1Btn, selectFaction2Btn, factionSelectionDiv, actionButtonsDiv, unitInfoDiv, dice1Div, dice2Div, bonusDiceContainer, roundCounterDiv, factionButtonsContainer, unitSelectionPanel } from './domElements.js'; // <<< unitSelectionPanel hozzáadva
 import { createGrid } from './grid.js';
 import { handlePlacementClick, initializeUnitPlacementForPlayer } from './unitPlacement.js';
 import { handleMoveAction, selectUnit, highlightPossibleTargets, clearHighlights, updateActionButtons } from './unitActions.js';
 import { handleAttackAction } from './combat.js';
 import { startGame, endActivation } from './gameFlow.js';
-import { gameStarted, selectedUnitCell, currentAction, activeUnit, unitsData, unitsActivatedThisRound, setGameStarted, setSelectedUnitCell, setCurrentAction, setHasMoved, setHasAttacked, setPlayer1Faction, setPlayer2Faction, player1Faction, player2Faction, initializeInitialUnits } from './gameState.js'; // <<< EZ A MÓDOSÍTOTT SOR!
+import { gameStarted, selectedUnitCell, currentAction, activeUnit, unitsData, unitsActivatedThisRound, setGameStarted, setSelectedUnitCell, setCurrentAction, setHasMoved, setHasAttacked, setPlayer1Faction, setPlayer2Faction, player1Faction, player2Faction, initializeInitialUnits, setCurrentPlayerBuildingArmy } from './gameState.js'; // <<< setCurrentPlayerBuildingArmy hozzáadva
 import { factionNames } from './factions.js';
+import { initializeUnitSelection } from './unitSelection.js'; // <<< ÚJ IMPORT
 
 
-// Globális változók a játékosok frakcióválasztásának nyomon követésére
+// Globális változók
 let player1FactionSelected = false;
 let player2FactionSelected = false;
-let currentPlayerSelectingFaction = null; // Nyomon követi, melyik játékos választ éppen frakciót
+let currentPlayerSelectingFaction = null;
 
 
 function handleGameClick(event) {
-    if (!gameStarted) return; // gameStarted a gameState-ből
+    if (!gameStarted) return;
 
     let clickedCell = event.target;
-    // Ellenőrizzük, hogy tényleg egy cellára kattintottunk-e és van-e rajta egység
     if (!clickedCell.classList.contains('grid-cell')) {
         return;
     }
@@ -32,8 +32,6 @@ function handleGameClick(event) {
     } else if (currentAction === 'attack') {
         handleAttackAction(clickedCell);
     } else {
-        // Csak akkor választhatunk egységet, ha még nem aktiválódott ebben a körben
-        // és az egység az aktuális játékoshoz tartozik
         if (unitName && unitsData[unitName] && !unitsActivatedThisRound[unitName] && clickedCell.dataset.player == getActivePlayer()) {
             selectUnit(clickedCell);
         } else if (selectedUnitCell && clickedCell === selectedUnitCell) {
@@ -42,11 +40,8 @@ function handleGameClick(event) {
     }
 }
 
-// Segédfüggvény az aktív játékos lekéréséhez (ezt később a gameFlow.js-ből kapjuk majd)
 function getActivePlayer() {
-    // Ezt a gameFlow.js-ből kellene exportálni, ha van már olyan változója.
-    // Jelenleg feltételezzük, hogy az 1. játékos kezdi a játékot, amíg nincs meg a játékosváltás logikája.
-    return 1;
+    return 1; // Ezt majd a gameFlow fogja kezelni
 }
 
 
@@ -55,18 +50,21 @@ selectFaction1Btn.addEventListener('click', () => {
     currentPlayerSelectingFaction = 1;
     displayFactionSelectionButtons();
     messageDisplayDiv.textContent = "Játékos 1, válaszd ki a frakciódat!";
+    selectFaction1Btn.disabled = true; // Letiltjuk a gombot, amíg nem választ frakciót
+    selectFaction2Btn.disabled = true; // Letiltjuk a másik játékos gombját is
 });
 
 selectFaction2Btn.addEventListener('click', () => {
     currentPlayerSelectingFaction = 2;
     displayFactionSelectionButtons();
     messageDisplayDiv.textContent = "Játékos 2, válaszd ki a frakciódat!";
+    selectFaction1Btn.disabled = true; // Letiltjuk az 1. játékos gombját
+    selectFaction2Btn.disabled = true; // Letiltjuk a gombot, amíg nem választ frakciót
 });
 
-// ÚJ FÜGGVÉNY: Megjeleníti a frakcióválasztó gombokat
 function displayFactionSelectionButtons() {
-    factionButtonsContainer.innerHTML = ''; // Töröljük a korábbi gombokat
-    factionButtonsContainer.style.display = 'flex'; // Megjelenítjük a konténert
+    factionButtonsContainer.innerHTML = '';
+    factionButtonsContainer.style.display = 'flex';
 
     factionNames.forEach(factionName => {
         const button = document.createElement('button');
@@ -79,40 +77,73 @@ function displayFactionSelectionButtons() {
     });
 }
 
-// ÚJ FÜGGVÉNY: Kezeli a frakcióválasztást (amikor egy frakció gombra kattintanak)
 function handleFactionSelection(factionChoice) {
     if (currentPlayerSelectingFaction === 1) {
         setPlayer1Faction(factionChoice);
         player1FactionNameH2.textContent = factionChoice;
         player1FactionSelected = true;
-        selectFaction1Btn.disabled = true; // Letiltjuk az 1. játékos gombját, ha már választott
     } else if (currentPlayerSelectingFaction === 2) {
         setPlayer2Faction(factionChoice);
         player2FactionNameH2.textContent = factionChoice;
         player2FactionSelected = true;
-        selectFaction2Btn.disabled = true; // Letiltjuk a 2. játékos gombját, ha már választott
     }
 
     messageDisplayDiv.textContent = `Játékos ${currentPlayerSelectingFaction} a ${factionChoice} frakciót választotta.`;
     factionButtonsContainer.style.display = 'none'; // Elrejtjük a frakció gombokat
-    currentPlayerSelectingFaction = null; // Visszaállítjuk
+    
+    // NEM TÖRÖLJÜK A factionSelectionDiv-et, mert azt használjuk a 2. játékos választásához!
+    // factionSelectionDiv.style.display = 'none'; // EZT TÖRÖLJÜK
 
-    // Ha mindkét frakció kiválasztva, indítsuk az egység elhelyezést
+    // Kezdjük az egységválasztást a jelenlegi játékosnak
+    initializeUnitSelection(currentPlayerSelectingFaction);
+
+    // Visszaállítjuk a kiválasztó játékost, ha befejeztük a fázist
     if (player1FactionSelected && player2FactionSelected) {
-        messageDisplayDiv.textContent = "Minden frakció kiválasztva. Helyezd el az egységeket!";
-        factionSelectionDiv.style.display = 'none'; // Elrejtjük az egész frakcióválasztó UI-t
-        gameGrid.style.display = 'grid'; // Megjelenítjük a gridet (a grid.js hozza létre a div-eket)
-        
-        roundCounterDiv.style.display = 'block';
-
-        initializeInitialUnits(player1Faction, player2Faction);
-        initializeUnitPlacementForPlayer(1);
+        // Ez a rész a finalizeArmySelection() függvényben fog lefutni,
+        // miután mindkét játékos kiválasztotta a seregét.
+        // Itt csak a jelenlegi játékos egységválasztását indítjuk el.
     }
 }
 
 
 // Kezdeti inicializálás
-createGrid(); // Létrehozza a rácsot (most már DIV-ekből)
+createGrid();
 gameGrid.addEventListener('click', handleGameClick);
 
-// A játék indulását most már a frakcióválasztás és egységelhelyezés vezérli.s
+// Akció gombok eseménykezelői (ha még nincsenek benne)
+moveButton.addEventListener('click', () => {
+    if (activeUnit) {
+        setCurrentAction('move');
+        messageDisplayDiv.textContent = `${activeUnit.dataset.unit} mozgatása. Kattints egy üres mezőre!`;
+        highlightPossibleTargets(selectedUnitCell, 'move');
+        updateActionButtons();
+    } else {
+        messageDisplayDiv.textContent = "Előbb válassz ki egy egységet a mozgatáshoz!";
+    }
+});
+
+attackButton.addEventListener('click', () => {
+    if (activeUnit) {
+        setCurrentAction('attack');
+        messageDisplayDiv.textContent = `${activeUnit.dataset.unit} támadása. Kattints egy ellenséges egységre!`;
+        highlightPossibleTargets(selectedUnitCell, 'attack');
+        updateActionButtons();
+    } else {
+        messageDisplayDiv.textContent = "Előbb válassz ki egy egységet a támadáshoz!";
+    }
+});
+
+endButton.addEventListener('click', () => {
+    endActivation();
+});
+
+// Alapértelmezett UI állapot
+unitSelectionPanel.style.display = 'none'; // Az egységválasztó panel alapértelmezetten rejtett
+actionButtonsDiv.style.display = 'none'; // Játékbeli gombok rejtve
+endButton.style.display = 'none'; // Kör vége gomb rejtve
+unitInfoDiv.style.display = 'none'; // Egység infó rejtve
+dice1Div.style.display = 'none'; // Kockák rejtve
+dice2Div.style.display = 'none'; // Kockák rejtve
+bonusDiceContainer.style.display = 'none'; // Bónusz kockák rejtve
+roundCounterDiv.style.display = 'none'; // Kör számláló rejtve
+gameGrid.style.display = 'none'; // Játékrács rejtve
