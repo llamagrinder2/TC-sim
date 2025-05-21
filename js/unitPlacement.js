@@ -87,6 +87,8 @@ export function highlightPlacementZones() {
     const startRow = currentPlayerPlacing === 1 ? 0 : 7;
     const endRow = currentPlayerPlacing === 1 ? 2 : 9;
 
+    console.log(`Kiemelés: Játékos ${currentPlayerPlacing}, Zóna: sor <span class="math-inline">\{startRow\}\-</span>{endRow}`); // Ellenőrzés
+    
     gridCells.forEach(cell => {
         const row = parseInt(cell.dataset.row);
         // Ellenőrizzük, hogy a cella a kezdőzónában van-e, ÉS üres-e (nincs rajta egység)
