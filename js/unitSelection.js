@@ -23,8 +23,6 @@ import {
     currentArmyList,
     currentArmyCost,
     factionButtonsContainer,
-    selectFaction1Btn, // Ezt is ki kell választani, ha itt történik a kezelése
-    selectFaction2Btn, // Ezt is ki kell választani, ha itt történik a kezelése
     finalizeArmyButton // Fontos a gombhoz
 } from './domElements.js';
 import { initializeUnitPlacementForPlayer } from './unitPlacement.js'; // Importáljuk az egységelhelyezési függvényt
