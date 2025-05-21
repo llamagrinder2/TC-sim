@@ -107,7 +107,7 @@ export function handlePlacementClick(clickedCell) {
     console.log("handlePlacementClick FUT, kattintott cella:", clickedCell);
 
    
-    if (!clickedCell.classList.contains('highlighted-move')) {
+    if (!clickedCell.classList.contains('highlighted-placement')) {
         console.log("Hiba: A cella nincs kijelölve egység elhelyezésre (nem zöld).");
         return;
     }
