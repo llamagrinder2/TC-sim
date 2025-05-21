@@ -1,6 +1,6 @@
 // js/main.js
 
-import { gameGrid, moveButton, attackButton, endButton, messageDisplayDiv, selectFaction1Btn, selectFaction2Btn, factionSelectionPanel, actionButtonsDiv, unitInfoDiv, dice1Div, dice2Div, bonusDiceContainer, roundCounterDiv, factionButtonsContainer, unitSelectionPanel } from './domElements.js';
+import { gameGrid, moveButton, attackButton, endButton, messageDisplayDiv, player1FactionSelectBtn, player2FactionSelectBtn, factionSelectionPanel, actionButtonsDiv, unitInfoDiv, dice1Div, dice2Div, bonusDiceContainer, roundCounterDiv, factionButtonsContainer, unitSelectionPanel } from './domElements.js';
 import { createGrid } from './grid.js';
 import { handlePlacementClick, initializeUnitPlacementForPlayer } from './unitPlacement.js';
 import { handleMoveAction, selectUnit, highlightPossibleTargets, clearHighlights, updateActionButtons } from './unitActions.js';
