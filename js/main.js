@@ -15,20 +15,21 @@ let currentPlayerSelectingFaction = null;
 
 
 function handleGameClick(event) {
-    if (!gameStarted) return;
-
+    console.log("Kattintás történt a rácson! Aktuális fázis:", gamePhase); // Ezt hagyd benne
     let clickedCell = event.target;
+
     if (!clickedCell.classList.contains('grid-cell')) {
         return;
     }
 
-    let unitID = clickedCell.dataset.unit;
-
-    if (currentAction === 'move') {
-        handleMoveAction(clickedCell);
-    } else if (currentAction === 'attack') {
-        handleAttackAction(clickedCell);
-    } else {
+    // Itt döntjük el, mit tegyen a kattintás a fázis alapján:
+    if (gamePhase === 'placement') { // Ha éppen egységet helyezünk el
+        handlePlacementClick(clickedCell); // Akkor hívjuk az egységelhelyező függvényt
+        console.log("handlePlacementClick meghívva a rácskattintáskor."); // Ezt is hagyd benne
+    } else if (gamePhase === 'combat') { // Ha harc fázisban vagyunk (később)
+        // Itt jönne a harci logika
+    } else { // Egyébként (pl. egység kiválasztása harcban)
+        let unitID = clickedCell.dataset.unit; // Feltételezve, hogy a unitPlacement.js beállítja a data-unit attribútumot
         if (unitID && unitsData[unitID] && !unitsActivatedThisRound[unitID] && unitsData[unitID].player == getActivePlayer()) {
             selectUnit(clickedCell);
         } else if (selectedUnitCell && clickedCell === selectedUnitCell) {
