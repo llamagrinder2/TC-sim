@@ -10,11 +10,6 @@ import { gameStarted, selectedUnitCell, currentAction, activeUnit, unitsData, un
 import { factionNames } from './factions.js';
 import { initializeUnitSelection } from './unitSelection.js'; // <<< ÚJ IMPORTú
 
-// js/main.js
-import { selectFaction1Btn } from './domElements.js'; // Csak a tesztelés kedvéért
-
-console.log('selectFaction1Btn a main.js-ben:', selectFaction1Btn); // Nézd meg a konzolt!
-
 // Globális változók
 let player1FactionSelected = false;
 let player2FactionSelected = false;
