@@ -13,6 +13,12 @@ export let selectedArmyUnit = null; // Az egységválasztó menüben kiválaszto
 export let unitsActivatedThisRound = {};
 export let unitsData = {}; // Itt tároljuk a játéktáblán lévő egységek adatait
 
+export let gamePhase = 'factionSelection'; // Kezdjük a frakcióválasztással
+export function setGamePhase(newPhase) {
+    gamePhase = newPhase;
+    console.log("Játékfázis beállítva:", gamePhase); // Ezt a sort beleteheted, hogy láthasd a konzolban a fázisváltásokat
+}
+
 // Frakció adatok
 export let player1Faction = null;
 export let player2Faction = null;
