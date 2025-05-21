@@ -14,7 +14,7 @@ export const factionButtonsContainer = document.getElementById('factionButtonsCo
 
 // Egységválasztó panel elemei
 export const unitSelectionPanel = document.getElementById('unitSelectionPanel');
-export const currentDucatsDisplay = document.getElementById('currentDucatsDisplay');
+export const currentDucatsDisplay = document.getElementById('currentDucats');
 export const currentArmyList = document.getElementById('currentArmyList');
 export const currentArmyCost = document.getElementById('currentArmyCost'); // <-- ÚJ: Ezt kellett hozzáadni!
 export const finalizeArmyButton = document.getElementById('finalizeArmyButton'); // Új: A sereg véglegesítése gomb
