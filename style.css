@@ -1,261 +1,127 @@
-/* Alapvető stílusok */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #222;
-    color: #eee;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-}
+/* style.css */
 
-h1 {
-    color: #f0f0f0;
-    margin-bottom: 20px;
-}
+/* ... (meglévő stílusok) ... */
 
-.game-container {
-    display: flex;
-    background-color: #333;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
-    padding: 20px;
-    gap: 20px; /* Helyköz a rács és a vezérlőpanel között */
-}
-
-/* Játékrács stílusok (most már DIV alapú grid) */
-.grid-container {
-    display: grid; /* Beállítva JavaScriptből is, de itt az alap */
-    border: 2px solid #555;
-    background-color: #444;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-    display: none; /* Alapértelmezetten rejtett, amíg nem kezdődik a játék */
-}
-
-.grid-cell {
-    width: 50px; /* Ezt a JS is beállítja a gridTemplateColumns/Rows-ban */
-    height: 50px; /* Ezt a JS is beállítja a gridTemplateColumns/Rows-ban */
-    border: 1px solid #555;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.1s ease;
-}
-
-.grid-cell:hover {
-    background-color: #666;
-}
-
-.highlighted-move {
-    background-color: #4CAF50; /* Zöld mozgási célpont */
-}
-
-.highlighted-attack {
-    background-color: #F44336; /* Piros támadási célpont */
-}
-
-.selected-unit {
-    border: 3px solid #FFD700; /* Arany keret a kiválasztott egységen */
-}
-
-/* Vezérlőpanel stílusok */
-.control-panel {
-    display: flex;
+/* ÚJ: Egységválasztó panel stílusok */
+.unit-selection-panel {
+    display: none; /* Alapértelmezetten rejtve van */
     flex-direction: column;
     gap: 15px;
-    width: 300px;
+    width: 300px; /* Vagy amekkora méretet szeretnél */
     background-color: #2c2c2c;
     padding: 15px;
     border-radius: 8px;
     box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
+    align-items: center;
+    text-align: center;
 }
 
-.message-display {
+.unit-selection-panel h3 {
+    color: #f0f0f0;
+    margin-bottom: 10px;
+}
+
+.current-ducats {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #4CAF50; /* Zöld szín a ducatnak */
+    margin-bottom: 10px;
+}
+
+.unit-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-height: 250px; /* Korlátozott magasság, ha sok egység van */
+    overflow-y: auto; /* Görgethetővé teszi, ha sok egység van */
+    padding-right: 5px; /* Hely a görgetősávnak */
+}
+
+.unit-selection-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #3a3a3a;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #555;
+}
+
+.unit-selection-item span {
+    flex-grow: 1;
+    text-align: left;
+    color: #eee;
+}
+
+.unit-add-button,
+.unit-remove-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-left: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.unit-remove-button {
+    background-color: #dc3545; /* Piros szín */
+}
+
+.unit-add-button:hover { background-color: #0056b3; }
+.unit-remove-button:hover { background-color: #c82333; }
+
+.current-army-display {
     background-color: #1a1a1a;
     border: 1px solid #444;
     padding: 10px;
     border-radius: 5px;
-    font-size: 0.9em;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.current-army-display h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
     color: #fff;
     text-align: center;
-    min-height: 40px; /* Hogy legyen hely az üzeneteknek */
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-.round-counter {
-    margin-top: 5px;
-    font-size: 1.1em;
-    color: #eee;
-    text-align: center;
-    display: none; /* Alapértelmezetten rejtett, amíg nem kezdődik a játék */
+#currentArmyList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: #bbb;
+    max-height: 120px; /* Görgethető lista */
+    overflow-y: auto;
 }
 
-.unit-info {
-    font-size: 1em;
-    color: #aaa;
-    text-align: center;
-    min-height: 20px;
-    display: none; /* Alapértelmezetten rejtett, amíg nem kezdődik a játék */
+#currentArmyList li {
+    padding: 3px 0;
+    border-bottom: 1px dashed #333;
 }
 
-/* Frakcióválasztó stílusok */
-.faction-selection {
-    display: flex;
-    flex-direction: column; /* Egymás alá kerüljenek a játékosok */
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #333;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+#currentArmyList li:last-child {
+    border-bottom: none;
 }
 
-.player-faction {
-    text-align: center;
-    margin: 10px 0; /* Több hely függőlegesen */
-    color: #eee;
-}
-
-.player-faction h2 {
-    margin-bottom: 10px;
-    font-size: 1.4em; /* Kicsit nagyobb címek */
-}
-
-.faction-selection button {
-    background-color: #555;
-    color: white;
-    border: none;
-    padding: 10px 20px; /* Nagyobb gombok */
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.2s ease;
-    width: 150px; /* Fix szélesség */
-}
-
-.faction-selection button:hover {
-    background-color: #777;
-}
-
-
-/* Akció gombok stílusai */
-.action-buttons {
-    display: flex;
-    justify-content: space-around;
-    gap: 10px;
-    display: none; /* Alapértelmezetten rejtett, amíg nem kezdődik a játék */
-}
-
-.action-button {
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.2s ease;
-    flex-grow: 1; /* Elosztja a helyet egyenletesen */
-}
-
-.action-button:hover {
-    background-color: #0056b3;
-}
-
-.action-button:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-}
-
-.end-turn-button {
-    background-color: #28a745;
-    width: 100%;
+#currentArmyCost {
     margin-top: 10px;
-    display: none; /* Alapértelmezetten rejtett, amíg nem kezdődik a játék */
+    font-weight: bold;
+    color: #FFD700; /* Arany szín */
+    text-align: center;
 }
 
-.end-turn-button:hover {
+#finalizeArmyButton {
+    margin-top: 15px;
+    background-color: #28a745; /* Zöld */
+}
+
+#finalizeArmyButton:hover {
     background-color: #218838;
 }
 
-/* Dobókocka kijelző stílusai */
-.dice-display {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-    min-height: 60px; /* Hogy legyen hely a kockáknak */
-    flex-wrap: wrap; /* Hogy több kocka esetén is elférjenek */
-    display: none; /* Alapértelmezetten rejtett, amíg nem kezdődik a játék */
-}
-
-.dice {
-    width: 40px;
-    height: 40px;
-    background-color: #eee;
-    color: #333;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.8em;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.bonus-dice-container {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap; /* Hogy elférjenek, ha sok van */
-    justify-content: center;
-}
-/* Faction Selection Styles */
-.faction-selection {
-    /* ... (meglévő stílusok) ... */
-    /* Módosítva, hogy a gombok is szépen elhelyezkedjenek */
-    display: flex;
-    flex-direction: column; /* Egymás alá kerüljenek a játékosválasztók és a gombok */
-    gap: 15px; /* Helyköz az elemek között */
-}
-
-.faction-buttons-container {
-    display: flex;
-    flex-wrap: wrap; /* Gombok tördelődjenek új sorba, ha nem férnek el */
-    justify-content: center;
-    gap: 8px; /* Helyköz a gombok között */
-    margin-top: 15px;
-    padding: 10px;
-    border: 1px solid #444;
-    border-radius: 5px;
-    background-color: #2a2a2a;
-    display: none; /* Alapértelmezetten rejtve, csak a "Válassz frakciót" gombra kattintva jelenik meg */
-}
-
-.faction-button {
-    background-color: #007BFF; /* Kék szín */
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.2s ease;
-    flex-grow: 0; /* Ne növekedjenek a gombok, fix méretűek legyenek */
-    flex-shrink: 0;
-    white-space: nowrap; /* Ne törjön sort a gomb szövege */
-}
-
-.faction-button:hover {
-    background-color: #0056b3;
-}
+/* ... (a többi stílus a fájl végén) ... */
