@@ -102,6 +102,13 @@ document.addEventListener('DOMContentLoaded', () => {
     createGrid(10, 10);
     gameGrid.addEventListener('click', handleGameClick);
 
+     if (gameGrid) { // Ellenőrzés, hogy a gameGrid létezik-e
+        gameGrid.addEventListener('click', handleGameClick);
+    } 
+     else {
+        console.error("Hiba: A 'gameGrid' DOM elem nem található!");
+    }
+    
     setupFactionSelection();
 
     moveButton.addEventListener('click', () => {
