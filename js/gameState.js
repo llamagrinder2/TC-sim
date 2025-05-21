@@ -31,11 +31,9 @@ export function setCurrentRound(round) {
     currentRound = round;
 }
 
-// ÚJ: incrementRound függvény hozzáadása
 export function incrementRound() {
     currentRound++;
 }
-
 
 export function setGameStarted(status) {
     gameStarted = status;
@@ -81,8 +79,13 @@ export function setCurrentPlayerBuildingArmy(playerNum) {
     currentPlayerBuildingArmy = playerNum;
 }
 
-export function setUnitsActivatedThisRound(units) {
+export function setUnitsActivatedThisRound(units) { // Ez egy általános setter, ami felülírja
     unitsActivatedThisRound = units;
+}
+
+// ÚJ: resetUnitsActivatedThisRound függvény hozzáadása
+export function resetUnitsActivatedThisRound() {
+    unitsActivatedThisRound = {}; // Alaphelyzetbe állítjuk az objektumot minden kör elején
 }
 
 export function setUnitsData(data) {
