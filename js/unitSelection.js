@@ -13,7 +13,8 @@ import {
     setPlayer2Faction, // Szükséges, ha itt történik a frakcióválasztás mentése
     setCurrentPlayerBuildingArmy, // Fontos a játékos azonosításához
     player1Faction,
-    player2Faction
+    player2Faction,
+    setGamePhase // <<< EZ AZ ÚJ IMPORT!
 } from './gameState.js';
 import { ALL_UNITS, FACTIONS, factionNames } from './factions.js'; // Fontos az egységadatok és frakciók miatt
 import {
@@ -193,6 +194,8 @@ function finalizeArmy() {
         player2FactionSelectBtn.disabled = true; // Játékos 2 gomb kikapcsolása
         messageDisplayDiv.textContent = 'Mindenki elkészült a seregépítéssel. Kezdődik az egységelhelyezés!';
         // Indítjuk az egységelhelyezést Játékos 1 számára
+        setGamePhase('placement');
+        
         initializeUnitPlacementForPlayer(1);
     }
 }
