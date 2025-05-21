@@ -11,7 +11,7 @@ export let hasAttacked = false; // Az aktív egység támadott-e már
 export let unitsPlaced = 0; // Elhelyezett egységek száma az elhelyezési fázisban
 export let selectedArmyUnit = null; // Az egységválasztó menüben kiválasztott egység (ha van ilyen logika)
 export let unitsActivatedThisRound = {};
-export let unitsData = {};
+export let unitsData = {}; // Itt tároljuk a játéktáblán lévő egységek adatait
 
 // Frakció adatok
 export let player1Faction = null;
@@ -26,12 +26,16 @@ export let player2DucatsSpent = 0; // A 2. játékos elköltött Ducatja
 export let currentPlayerBuildingArmy = null; // Melyik játékos építi éppen a seregét (1 vagy 2)
 
 // --- Állapotfrissítő függvények (Setters) ---
-// Ezekkel a függvényekkel módosítjuk a fenti állapot-változókat,
-// hogy a változások nyomon követhetőek és konzisztensek legyenek.
 
 export function setCurrentRound(round) {
     currentRound = round;
 }
+
+// ÚJ: incrementRound függvény hozzáadása
+export function incrementRound() {
+    currentRound++;
+}
+
 
 export function setGameStarted(status) {
     gameStarted = status;
@@ -73,10 +77,18 @@ export function setPlayer2Faction(faction) {
     player2Faction = faction;
 }
 
-// Seregépítéssel kapcsolatos seterek
 export function setCurrentPlayerBuildingArmy(playerNum) {
     currentPlayerBuildingArmy = playerNum;
 }
+
+export function setUnitsActivatedThisRound(units) {
+    unitsActivatedThisRound = units;
+}
+
+export function setUnitsData(data) {
+    unitsData = data;
+}
+
 
 /**
  * Hozzáad egy egységet a játékos seregéhez, ha van elég Ducat.
@@ -110,7 +122,6 @@ export function addUnitToArmy(playerNum, unitAbbreviation, cost) {
  */
 export function removeUnitFromArmy(playerNum, unitAbbreviation, cost) {
     const army = playerNum === 1 ? player1Army : player2Army;
-    // Nincs szükség a ducatsSpent ellenőrzésére itt, csak a ducat levonásra
 
     if (army[unitAbbreviation] > 0) {
         army[unitAbbreviation] -= 1;
@@ -119,7 +130,6 @@ export function removeUnitFromArmy(playerNum, unitAbbreviation, cost) {
         } else {
             player2DucatsSpent -= cost;
         }
-        // Ha elfogyott az egység, töröljük a kulcsot az objektumból
         if (army[unitAbbreviation] === 0) {
             delete army[unitAbbreviation];
         }
@@ -128,15 +138,8 @@ export function removeUnitFromArmy(playerNum, unitAbbreviation, cost) {
     return false; // Nincs ilyen egység a seregben
 }
 
-// Az initialUnits inicializálását most az egységelhelyezési fázisban fogjuk megtenni
-// a player1Army és player2Army alapján.
-// Ezért ez a függvény most üres, vagy az elhelyezéshez szükséges formátumot fogja létrehozni.
 export function initializeInitialUnits(faction1, faction2) {
     // Ezt a függvényt később kell majd kitölteni, amikor
     // a player1Army és player2Army alapján konkrét egységobjektumokat hozunk létre
     // a unitsData globális objektum számára, amik majd a rácsra kerülnek.
-    // Például:
-    // unitsData['HPr1'] = { type: 'HPr', player: 1, faction: faction1, currentHP: 10, maxHP: 10, ... };
-    // unitsData['DCo1'] = { type: 'DCo', player: 1, faction: faction1, currentHP: 10, maxHP: 10, ... };
-    // ... és a player 2 egységei.
 }
