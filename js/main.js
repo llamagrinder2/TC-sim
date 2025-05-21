@@ -18,10 +18,18 @@ function handleGameClick(event) {
     console.log("Kattintás történt a rácson! Aktuális fázis:", gamePhase); // Ezt hagyd benne
     let clickedCell = event.target;
 
-    if (!clickedCell.classList.contains('grid-cell')) {
-        return;
+     if (!clickedCell.classList.contains('grid-cell')) {
+        clickedCell = clickedCell.closest('.grid-cell');
     }
 
+     if (!clickedCell) {
+        console.log("Nem érvényes rács-cellán történt a kattintás, vagy nem található a szülő cella. Kilépés.");
+        return; // Kilépünk a függvényből
+    }
+
+    // Ha idáig eljutunk, a clickedCell egy érvényes .grid-cell DOM elem.
+    console.log("Érvényes rács-cellán történt a kattintás:", clickedCell);
+    
     // Itt döntjük el, mit tegyen a kattintás a fázis alapján:
     if (gamePhase === 'placement') { // Ha éppen egységet helyezünk el
         handlePlacementClick(clickedCell); // Akkor hívjuk az egységelhelyező függvényt
