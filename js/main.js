@@ -15,29 +15,36 @@ let currentPlayerSelectingFaction = null;
 
 
 function handleGameClick(event) {
-    console.log("Kattintás történt a rácson! Aktuális fázis:", gamePhase); // Ezt hagyd benne
+    console.log("Kattintás történt a rácson! Aktuális fázis:", gamePhase);
     let clickedCell = event.target;
 
-     if (!clickedCell.classList.contains('grid-cell')) {
+    // Ez a kulcsfontosságú rész: biztosítjuk, hogy a clickedCell egy .grid-cell DOM elem legyen.
+    // Ha nem magára a cellára, hanem egy benne lévő elemre (pl. kép) kattintottak,
+    // akkor megkeressük a legközelebbi szülő .grid-cell elemet.
+    // CSAK AKKOR HÍVD A .closest()-et, HA AZ event.target NEM A GRID-CELL.
+    if (!clickedCell.classList.contains('grid-cell')) {
         clickedCell = clickedCell.closest('.grid-cell');
     }
 
-     if (!clickedCell) {
+    // Nagyon fontos ellenőrzés: ha clickedCell még most is null vagy undefined,
+    // az azt jelenti, hogy a kattintás nem egy érvényes rács-cellán történt,
+    // VAGY a grid még nem látható/interaktív.
+    if (!clickedCell) {
         console.log("Nem érvényes rács-cellán történt a kattintás, vagy nem található a szülő cella. Kilépés.");
         return; // Kilépünk a függvényből
     }
 
     // Ha idáig eljutunk, a clickedCell egy érvényes .grid-cell DOM elem.
     console.log("Érvényes rács-cellán történt a kattintás:", clickedCell);
-    
+
     // Itt döntjük el, mit tegyen a kattintás a fázis alapján:
     if (gamePhase === 'placement') { // Ha éppen egységet helyezünk el
         handlePlacementClick(clickedCell); // Akkor hívjuk az egységelhelyező függvényt
-        console.log("handlePlacementClick meghívva a rácskattintáskor."); // Ezt is hagyd benne
+        console.log("handlePlacementClick meghívva a rácskattintáskor.");
     } else if (gamePhase === 'combat') { // Ha harc fázisban vagyunk (később)
         // Itt jönne a harci logika
     } else { // Egyébként (pl. egység kiválasztása harcban)
-        let unitID = clickedCell.dataset.unit; // Feltételezve, hogy a unitPlacement.js beállítja a data-unit attribútumot
+        let unitID = clickedCell.dataset.unit;
         if (unitID && unitsData[unitID] && !unitsActivatedThisRound[unitID] && unitsData[unitID].player == getActivePlayer()) {
             selectUnit(clickedCell);
         } else if (selectedUnitCell && clickedCell === selectedUnitCell) {
@@ -47,70 +54,29 @@ function handleGameClick(event) {
 }
 
 function getActivePlayer() {
+    // Ezt a függvényt valószínűleg a gameState-be kellene áthelyezni
+    // és az aktuális játékost nyomon követni, de most így marad
     return 1;
 }
 
 
-// --- FONTOS: Ezek a frakcióválasztó eseménykezelők és a displayFactionSelectionButtons függvény
-// valószínűleg redundánsak itt, ha a unitSelection.js már kezeli őket a setupFactionSelection-ben.
-// Ideális esetben ezeket a sorokat törölni kell, ha már áthelyezted őket.
-// Ha mégis itt vannak, duplikált eseménykezelőket vagy logikát okoznak.
-/*
-selectFaction1Btn.addEventListener('click', () => {
-    currentPlayerSelectingFaction = 1;
-    displayFactionSelectionButtons();
-    messageDisplayDiv.textContent = "Játékos 1, válaszd ki a frakciódat!";
-    selectFaction1Btn.disabled = true;
-    selectFaction2Btn.disabled = true;
-});
-
-selectFaction2Btn.addEventListener('click', () => {
-    currentPlayerSelectingFaction = 2;
-    displayFactionSelectionButtons();
-    messageDisplayDiv.textContent = "Játékos 2, válaszd ki a frakciódat!";
-    selectFaction1Btn.disabled = true;
-    selectFaction2Btn.disabled = true;
-});
-
-function displayFactionSelectionButtons() {
-    factionButtonsContainer.innerHTML = '';
-    factionButtonsContainer.style.display = 'flex';
-
-    factionNames.forEach(factionName => {
-        const button = document.createElement('button');
-        button.classList.add('faction-button');
-        button.textContent = factionName;
-        button.addEventListener('click', () => {
-            handleFactionSelection(factionName);
-        });
-        factionButtonsContainer.appendChild(button);
-    });
-}
-*/
-
-
-function handleFactionSelection(factionChoice) {
-    // Ez a függvény a unitSelection.js-be került áthelyezésre a "selectFaction" néven!
-    // IDEÁLIS ESETBEN EZ A FÜGGVÉNY TELJESEN HIÁNYZIK A main.js-ből.
-    // Ha itt maradna, duplikált logikát tartalmazna.
-    console.error("handleFactionSelection van hívva a main.js-ben, de ennek a unitSelection.js-ben (selectFaction néven) kellene lennie!");
-    // initializeUnitSelectionPanel(currentPlayerSelectingFaction); // <-- HÍVÁS, HA MÉGIS ITT MARADNA
-}
-
+// --- FONTOS MÓDOSÍTÁS ITT ALUL ---
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Létrehozzuk a játékrácsot
     createGrid(10, 10);
-    gameGrid.addEventListener('click', handleGameClick);
 
-     if (gameGrid) { // Ellenőrzés, hogy a gameGrid létezik-e
+    // 2. ELLENŐRIZZÜK, HOGY A gameGrid LÉTEZIK-E, ÉS CSAK EGYSZER ADJUK HOZZÁ AZ ESEMÉNYKEZELŐT
+    if (gameGrid) {
         gameGrid.addEventListener('click', handleGameClick);
-    } 
-     else {
-        console.error("Hiba: A 'gameGrid' DOM elem nem található!");
+    } else {
+        console.error("Hiba: A 'gameGrid' DOM elem nem található! Az eseménykezelő nem adható hozzá.");
     }
     
+    // 3. Inicializáljuk a frakcióválasztást
     setupFactionSelection();
 
+    // 4. Eseménykezelők a cselekvés gombokhoz (ezek a harc fázisban lesznek relevánsak)
     moveButton.addEventListener('click', () => {
         if (activeUnit) {
             setCurrentAction('move');
@@ -137,6 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
         endActivation();
     });
 
+    // 5. KEZDETI ÁLLAPOTOK BEÁLLÍTÁSA: ELREJTÜNK MINDENT, AMI MÉG NEM KELL
+    // Ez a logikád eddig is jól működött
     unitSelectionPanel.style.display = 'none';
     actionButtonsDiv.style.display = 'none';
     endButton.style.display = 'none';
@@ -145,9 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
     dice2Div.style.display = 'none';
     bonusDiceContainer.style.display = 'none';
     roundCounterDiv.style.display = 'none';
-    gameGrid.style.display = 'none';
+    gameGrid.style.display = 'none'; // KÖTELEZŐ ELREJTENI, ha a játék kezdetén nem kell látszódnia!
 
-    // factionSelectionPanel.style.display = 'flex'; // setupFactionSelection() már kezeli
+    // A factionSelectionPanel-t nem kell itt manuálisan megjeleníteni,
+    // mert a setupFactionSelection() gondoskodik róla.
 });
 
 
