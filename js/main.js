@@ -1,6 +1,6 @@
 // js/main.js
 
-import { gameGrid, moveButton, attackButton, endButton, messageDisplayDiv, player1FactionNameH2, player2FactionNameH2, selectFaction1Btn, selectFaction2Btn, factionSelectionDiv, actionButtonsDiv, unitInfoDiv, dice1Div, dice2Div, bonusDiceContainer, roundCounterDiv, factionButtonsContainer, unitSelectionPanel } from './domElements.js'; // <<< unitSelectionPanel hozzáadva
+import { gameGrid, moveButton, attackButton, endButton, messageDisplayDiv, player1FactionNameH2, player2FactionNameH2, selectFaction1Btn, selectFaction2Btn, factionSelectionPanel, actionButtonsDiv, unitInfoDiv, dice1Div, dice2Div, bonusDiceContainer, roundCounterDiv, factionButtonsContainer, unitSelectionPanel } from './domElements.js'; // <<< unitSelectionPanel hozzáadva
 import { createGrid } from './grid.js';
 import { handlePlacementClick, initializeUnitPlacementForPlayer } from './unitPlacement.js';
 import { handleMoveAction, selectUnit, highlightPossibleTargets, clearHighlights, updateActionButtons } from './unitActions.js';
