@@ -61,6 +61,10 @@ h1 {
     background-color: #F44336; /* Piros támadási célpont */
 }
 
+.highlighted-placement {
+    background-color: #4CAF50; /* Zöld elhelyezési terület */
+}
+
 .selected-unit {
     border: 3px solid #FFD700; /* Arany keret a kiválasztott egységen */
 }
