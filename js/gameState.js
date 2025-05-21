@@ -11,6 +11,7 @@ export let hasAttacked = false; // Az aktív egység támadott-e már
 export let unitsPlaced = 0; // Elhelyezett egységek száma az elhelyezési fázisban
 export let selectedArmyUnit = null; // Az egységválasztó menüben kiválasztott egység (ha van ilyen logika)
 export let unitsActivatedThisRound = {};
+export let unitsData = {};
 
 // Frakció adatok
 export let player1Faction = null;
