@@ -11,7 +11,8 @@ import {
     incrementUnitsPlaced,
     resetUnitsPlaced,
     setGameStarted,
-    setUnitsData
+    setUnitsData,
+    setGamePhase
 } from './gameState.js';
 import { ALL_UNITS } from './factions.js';
 
@@ -49,7 +50,7 @@ export function selectNextUnitToPlace() {
             return; // Megtaláltuk az egységet, kilépünk
         }
     }
-
+    clearHighlights(); // Fontos: töröljük az előző játékos zónáinak kiemelését
     // Ha idáig eljutunk, az összes egység el van helyezve a jelenlegi játékos számára
     if (currentPlayerPlacing === 1) {
         messageDisplayDiv.textContent = `Játékos 1, minden egységedet elhelyezted! Most Játékos 2 következik!`;
@@ -66,11 +67,12 @@ export function selectNextUnitToPlace() {
         document.querySelector('.faction-selection').style.display = 'flex'; // Ideiglenesen ide helyezve, ha szükséges
         document.getElementById('selectFaction1Btn').disabled = true; // Ideiglenesen ide helyezve, ha szükséges
         document.getElementById('selectFaction2Btn').disabled = false; // Ideiglenesen ide helyezve, ha szükséges
-
+        initializeUnitPlacementForPlayer(2);
     } else {
         // Mindkét játékos végzett az elhelyezéssel, kezdődjön a játék!
         messageDisplayDiv.textContent = `Mindkét sereg a helyén! Kezdődjön a játék!`;
         setGameStarted(true); // Játék indítása
+        setGamePhase('combat');
         // Megjelenítjük a harci UI elemeket
         document.getElementById('actionButtons').style.display = 'flex';
         document.getElementById('endButton').style.display = 'block';
@@ -83,7 +85,7 @@ export function selectNextUnitToPlace() {
         document.querySelector('.faction-selection').style.display = 'none';
         document.getElementById('unitSelectionPanel').style.display = 'none';
     }
-    clearHighlights(); // Eltávolítjuk a kiemeléseket
+    //clearHighlights(); // Eltávolítjuk a kiemeléseket
 }
 
 export function highlightPlacementZones() {
@@ -168,7 +170,7 @@ export function handlePlacementClick(clickedCell) {
             incrementUnitsPlaced();
 
             // Fontos: Töröljük a highlightot a celláról, miután elhelyeztük az egységet
-            clickedCell.classList.remove('highlighted-move');
+            clickedCell.classList.remove('highlighted-placement');
 
 
             if (playerArmy[currentUnitToPlace] === 0) {
