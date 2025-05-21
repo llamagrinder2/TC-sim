@@ -11,7 +11,9 @@ import {
     removeUnitFromArmy,
     setPlayer1Faction, // Szükséges, ha itt történik a frakcióválasztás mentése
     setPlayer2Faction, // Szükséges, ha itt történik a frakcióválasztás mentése
-    setCurrentPlayerBuildingArmy // Fontos a játékos azonosításához
+    setCurrentPlayerBuildingArmy, // Fontos a játékos azonosításához
+    player1Faction,
+    player1Faction
 } from './gameState.js';
 import { ALL_UNITS, FACTIONS, factionNames } from './factions.js'; // Fontos az egységadatok és frakciók miatt
 import {
