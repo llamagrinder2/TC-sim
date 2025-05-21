@@ -1,72 +1,173 @@
 // js/unitPlacement.js
 
-import { unitsData, unitsActivatedThisRound, initialUnits, unitsPlaced, incrementUnitsPlaced, selectedArmyUnit, setSelectedArmyUnit, player1Faction, player2Faction } from './gameState.js';
-import { unitInfoDiv, messageDisplayDiv, gameGrid } from './domElements.js'; // armyPlacementTable már nincs
-import { startGame } from './gameFlow.js';
-import { FACTIONS } from './factions.js'; // Importáljuk a frakciókat
+import { gameGrid, messageDisplayDiv } from './domElements.js';
+import {
+    unitsData, // <<< Fontos: itt tároljuk majd az elhelyezett egységeket
+    player1Army,
+    player2Army,
+    player1Faction,
+    player2Faction,
+    unitsPlaced,
+    incrementUnitsPlaced,
+    resetUnitsPlaced,
+    setGameStarted,
+    setUnitsData // Hozzáadjuk a setUnitsData-t
+} from './gameState.js'; // Importáljuk az új állapotváltozókat
+import { ALL_UNITS } from './factions.js'; // Szükségünk van az egységadatokra
 
-let currentPlacementPlayer = 1; // Melyik játékos helyez el éppen egységet
-let currentUnitsToPlace = []; // Az aktuális játékos egységei
+// SEGÉDVÁLTOZÓK AZ ELHELYEZÉSHEZ
+let currentPlayerPlacing = null; // Melyik játékos helyez el éppen egységet (1 vagy 2)
+let currentUnitToPlace = null; // Melyik egységtípust helyezi el éppen a játékos
+let unitCounter = 0; // Segít egyedi ID-t adni az egységeknek (pl. HPr1, HPr2)
 
+// Ez a függvény indul el, amikor egy játékos befejezte a seregének építését
 export function initializeUnitPlacementForPlayer(playerNum) {
-    currentPlacementPlayer = playerNum;
-    messageDisplayDiv.textContent = `Játékos ${playerNum}, helyezd el az egységeidet!`;
-    
-    // Meghatározzuk, melyik frakció egységeit kell elhelyezni
-    const faction = playerNum === 1 ? player1Faction : player2Faction;
-    currentUnitsToPlace = FACTIONS[faction].units.map(unitType => `${unitType}${playerNum}`); // Pl. TP1, HT1
+    currentPlayerPlacing = playerNum;
+    resetUnitsPlaced(); // Minden játékosnál nullázunk, ha külön fázisban van
 
-    // Kiválasztjuk az első egységet az elhelyezéshez
-    if (currentUnitsToPlace.length > 0) {
-        setSelectedArmyUnit(currentUnitsToPlace.shift()); // Kiveszi az elsőt és beállítja
-        unitInfoDiv.textContent = `${selectedArmyUnit} kiválasztva. Helyezd el a táblán!`;
-    } else {
-        unitInfoDiv.textContent = "Nincs több egység elhelyezésre.";
-    }
-    
-    // Az elhelyezéshez szükséges eseményfigyelők
-    gameGrid.addEventListener('click', handlePlacementClick);
+    // Megjelenítjük a játékrácsot
+    gameGrid.style.display = 'grid';
+
+    // Elrejtjük a frakció és seregválasztó paneleket, ha még látszódnának
+    document.querySelector('.faction-selection').style.display = 'none';
+    document.getElementById('unitSelectionPanel').style.display = 'none';
+
+    messageDisplayDiv.textContent = `Játékos ${playerNum}, helyezd el az egységeidet!`;
+
+    // Megkeressük az első egységet, amit el kell helyezni
+    selectNextUnitToPlace();
 }
+
+function selectNextUnitToPlace() {
+    const playerArmy = currentPlayerPlacing === 1 ? player1Army : player2Army;
+
+    // Megkeressük az első egységtípust, ami még nincs teljesen elhelyezve
+    for (const unitAbbr in playerArmy) {
+        if (playerArmy[unitAbbr] > 0) { // Ha van még ilyen egység, amit el kell helyezni
+            currentUnitToPlace = unitAbbr;
+            messageDisplayDiv.textContent =
+                `Játékos ${currentPlayerPlacing}, helyezz el egy ${ALL_UNITS[unitAbbr].name}-t (${playerArmy[unitAbbr]} még maradt)!` +
+                ` Kattints egy üres mezőre a saját kezdőzónádban!`;
+            highlightPlacementZones(); // Kiemeljük a zónákat
+            return; // Megtaláltuk az egységet, kilépünk
+        }
+    }
+
+    // Ha idáig eljutunk, az összes egységet elhelyezték
+    if (currentPlayerPlacing === 1) {
+        // Ha az 1. játékos végzett, átadjuk a 2. játékosnak
+        messageDisplayDiv.textContent = `Játékos 1, minden egységedet elhelyezted! Most Játékos 2 következik!`;
+        // Visszaállítjuk a frakcióválasztót, hogy Játékos 2 kiválaszthassa a frakcióját, ha még nem tette meg
+        document.querySelector('.faction-selection').style.display = 'flex';
+        document.getElementById('selectFaction1Btn').disabled = true;
+        document.getElementById('selectFaction2Btn').disabled = false;
+        // Játékos 2 fogja elindítani a saját initializeUnitPlacementForPlayer-ét, amikor kiválasztja a frakcióját és seregét
+    } else {
+        // Ha a 2. játékos is végzett, indítjuk a játékot
+        messageDisplayDiv.textContent = `Mindkét sereg a helyén! Kezdődjön a játék!`;
+        setGameStarted(true); // Játék indítása
+        // Később majd itt hívjuk meg a startGame() függvényt a gameFlow.js-ből
+        // startGame();
+        // A játék indulásakor meg kell jelennie a játékmenet gomboknak és a rácsnak
+        document.getElementById('actionButtons').style.display = 'flex';
+        document.getElementById('endButton').style.display = 'block';
+        document.getElementById('roundCounter').style.display = 'block';
+        document.getElementById('unitInfo').style.display = 'block';
+        document.getElementById('dice1').style.display = 'block';
+        document.getElementById('dice2').style.display = 'block';
+        document.getElementById('bonusDiceContainer').style.display = 'flex'; // Vagy block
+    }
+    clearHighlights(); // Eltávolítjuk a kiemeléseket
+}
+
+
+function highlightPlacementZones() {
+    clearHighlights(); // Töröljük az előző kiemeléseket
+    const gridCells = gameGrid.querySelectorAll('.grid-cell');
+    const startRow = currentPlayerPlacing === 1 ? 0 : 7; // Játékos 1: 0. sor, Játékos 2: 7. sor (ha 8x8-as a rács)
+    const endRow = currentPlayerPlacing === 1 ? 2 : 9; // Játékos 1: 2. sor, Játékos 2: 9. sor (ha 10x10-es a rács, és 3 soros a zóna)
+
+    gridCells.forEach(cell => {
+        const row = parseInt(cell.dataset.row);
+        // Csak a megadott sorokban, és ha a cella még üres
+        if (row >= startRow && row <= endRow && !cell.dataset.unit) {
+            cell.classList.add('highlighted-move'); // Újrahasználjuk a move highlightot
+        }
+    });
+}
+
 
 export function handlePlacementClick(event) {
     const clickedCell = event.target;
-    // Ellenőrizzük, hogy a cella üres-e, és van-e éppen elhelyezendő egység
-    if (clickedCell.classList.contains('grid-cell') && clickedCell.textContent === '' && selectedArmyUnit) {
-        const unitName = selectedArmyUnit;
-        const unitType = unitName.slice(0, -1); // Pl. TP1 -> TP
-        const unitPlayer = parseInt(unitName.slice(-1)); // Pl. TP1 -> 1
+    if (!clickedCell.classList.contains('grid-cell') || !currentUnitToPlace) {
+        return; // Nem cellára kattintott, vagy nincs kiválasztott egység
+    }
 
-        clickedCell.textContent = unitName;
-        clickedCell.dataset.unit = unitName;
-        clickedCell.dataset.player = unitPlayer; // Hozzáadjuk a játékos adatot a cellához
-        
-        unitsData[unitName] = { bloodMarkers: 0, type: unitType, player: unitPlayer };
-        unitsActivatedThisRound[unitName] = false;
+    const row = parseInt(clickedCell.dataset.row);
+    const col = parseInt(clickedCell.dataset.col);
+    const playerFaction = currentPlayerPlacing === 1 ? player1Faction : player2Faction;
+    const playerArmy = currentPlayerPlacing === 1 ? player1Army : player2Army;
 
-        incrementUnitsPlaced(); // Növeljük az elhelyezett egységek számát
+    const isInsidePlacementZone = (currentPlayerPlacing === 1 && row >= 0 && row <= 2) || // 1. játékos zónája (0-2 sorok)
+                                  (currentPlayerPlacing === 2 && row >= 7 && row <= 9); // 2. játékos zónája (7-9 sorok) (ha 10x10-es a rács)
 
-        // Következő egység beállítása, vagy befejezés
-        if (currentUnitsToPlace.length > 0) {
-            setSelectedArmyUnit(currentUnitsToPlace.shift());
-            unitInfoDiv.textContent = `${selectedArmyUnit} kiválasztva. Helyezd el a táblán!`;
-        } else {
-            setSelectedArmyUnit(null); // Nincs több elhelyezendő egység
-            unitInfoDiv.textContent = `Játékos ${currentPlacementPlayer} egységei elhelyezve!`;
-            gameGrid.removeEventListener('click', handlePlacementClick); // Levesszük az eseményfigyelőt
+    // Ellenőrizzük, hogy üres-e a cella és a saját zónában van-e
+    if (!clickedCell.dataset.unit && isInsidePlacementZone) {
+        if (playerArmy[currentUnitToPlace] > 0) {
+            // Hozzáadjuk az egységet a cellához és a unitsData-hoz
+            const unitAbbr = currentUnitToPlace;
+            const unitData = ALL_UNITS[unitAbbr];
+            unitCounter++;
+            const unitID = `${unitAbbr}${unitCounter}`; // Egyedi ID (pl. HPr1, DCo1)
 
-            // Ellenőrizzük, hogy a másik játékos is elhelyezte-e már az egységeit
-            // Ideiglenes megoldás: Feltételezzük, hogy 2 egységet helyez el mindenki
-            if (Object.keys(unitsData).length === Object.keys(FACTIONS[player1Faction].units).length + Object.keys(FACTIONS[player2Faction].units).length) {
-                 startGame(); // Mindkét játékos elhelyezte az egységeit, indítsuk a játékot
-                 // Elrejtjük a frakcióválasztó gombokat és megjelenítjük a játékmezőt
-                 messageDisplayDiv.textContent = "A játék elkezdődik!";
-            } else {
-                // A másik játékos helyez el egységet
-                initializeUnitPlacementForPlayer(currentPlacementPlayer === 1 ? 2 : 1);
+            clickedCell.textContent = unitAbbr;
+            clickedCell.dataset.unit = unitID; // DOM-on tároljuk az egyedi ID-t
+            clickedCell.dataset.player = currentPlayerPlacing;
+            clickedCell.dataset.faction = playerFaction;
+
+            // Hozzáadjuk a unitsData globális objektumhoz
+            unitsData[unitID] = {
+                id: unitID,
+                type: unitAbbr,
+                player: currentPlayerPlacing,
+                faction: playerFaction,
+                row: row,
+                col: col,
+                // Itt adhatsz hozzá további alapértékeket (pl. HP, mozgás, támadás),
+                // amiket a ALL_UNITS-ból vehetsz
+                maxHP: 10, // Ideiglenes érték, amíg nem tesszük bele az ALL_UNITS-ba
+                currentHP: 10,
+                movement: unitData.movement || 6, // Feltételezve, hogy van ilyen property az ALL_UNITS-ban
+                ranged: unitData.ranged || 0,
+                melee: unitData.melee || 0,
+                armour: unitData.armour || 0,
+            };
+
+            // Frissítjük a gameState-ben a unitsData-t
+            setUnitsData(unitsData);
+
+            // Csökkentjük az elhelyezésre váró egységek számát
+            playerArmy[unitAbbr]--;
+            incrementUnitsPlaced();
+
+            // Ha az adott egységtípusból már nincs több, válasszunk újat, különben ugyanazt ajánljuk
+            if (playerArmy[unitAbbr] === 0) {
+                // Töröljük a nulla mennyiségű egységtípust a playerArmy-ból
+                delete playerArmy[unitAbbr];
             }
+
+            selectNextUnitToPlace(); // Válasszuk ki a következő egységet, vagy fejezzük be
+
+        } else {
+            messageDisplayDiv.textContent = `Nincs több ${ALL_UNITS[currentUnitToPlace].name} a seregedben, vagy érvénytelen lépés!`;
         }
+    } else {
+        messageDisplayDiv.textContent = "Érvénytelen helyezés! Válassz egy üres mezőt a saját kezdőzónádban!";
     }
 }
 
-// Az initializeArmyPlacement funkcióra már nincs szükség, mert a handlePlacementClick kezeli a kattintásokat
-// export function initializeArmyPlacement() { ... }
+function clearHighlights() {
+    gameGrid.querySelectorAll('.grid-cell').forEach(cell => {
+        cell.classList.remove('highlighted-move', 'highlighted-attack', 'selected-unit');
+    });
+}
