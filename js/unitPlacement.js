@@ -85,10 +85,23 @@ function highlightPlacementZones() {
 
 export function handlePlacementClick(event) {
     const clickedCell = event.target;
-    if (!clickedCell.classList.contains('grid-cell') || !currentUnitToPlace) {
+  //  if (!clickedCell.classList.contains('grid-cell') || !currentUnitToPlace) {
+  //      return;
+  // }
+   //INNEN ÚJ, ELŐZŐ KAKIJAVÍTÁS 
+    if (!clickedCell.classList.contains('highlight-placement')) {
+        console.log("Hiba: A cella nincs kijelölve egység elhelyezésre (nem zöld).");
         return;
     }
 
+    // A unitToPlace (amit a previous válaszban currentUnitToPlace-nek hívtam) ellenőrzése is fontos!
+    // Feltételezem, hogy van egy 'unitToPlace' változód, amit az initializeUnitPlacementForPlayer állít be.
+    if (!unitToPlace || Object.keys(unitToPlace).length === 0) {
+        console.log("Hiba: Nincs kiválasztott egység a lehelyezéshez (unitToPlace üres vagy nincs definiálva).");
+        return;
+    }
+
+    
     const row = parseInt(clickedCell.dataset.row);
     const col = parseInt(clickedCell.dataset.col);
     const playerFaction = currentPlayerPlacing === 1 ? player1Faction : player2Faction;
