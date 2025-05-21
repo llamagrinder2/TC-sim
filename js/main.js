@@ -8,8 +8,12 @@ import { handleAttackAction } from './combat.js';
 import { startGame, endActivation } from './gameFlow.js';
 import { gameStarted, selectedUnitCell, currentAction, activeUnit, unitsData, unitsActivatedThisRound, setGameStarted, setSelectedUnitCell, setCurrentAction, setHasMoved, setHasAttacked, setPlayer1Faction, setPlayer2Faction, player1Faction, player2Faction, initializeInitialUnits, setCurrentPlayerBuildingArmy } from './gameState.js'; // <<< setCurrentPlayerBuildingArmy hozzáadva
 import { factionNames } from './factions.js';
-import { initializeUnitSelection } from './unitSelection.js'; // <<< ÚJ IMPORT
+import { initializeUnitSelection } from './unitSelection.js'; // <<< ÚJ IMPORTú
 
+// js/main.js
+import { selectFaction1Btn } from './domElements.js'; // Csak a tesztelés kedvéért
+
+console.log('selectFaction1Btn a main.js-ben:', selectFaction1Btn); // Nézd meg a konzolt!
 
 // Globális változók
 let player1FactionSelected = false;
