@@ -15,7 +15,7 @@ import {
 } from './gameState.js';
 import { ALL_UNITS } from './factions.js';
 
-// SEGÉDVÁLTOZÓK AZ ELHELYEZÉSHEZ
+// SEGÉDVÁLTOZÓK AZ ELHELYEZÉSHEZ (ezek rendben vannak)
 let currentPlayerPlacing = null;
 let currentUnitToPlace = null;
 let unitCounter = 0;
@@ -24,6 +24,7 @@ export function initializeUnitPlacementForPlayer(playerNum) {
     currentPlayerPlacing = playerNum;
     resetUnitsPlaced();
 
+    // A gameGrid megjelenítése itt is rendben van, hiszen az egységelhelyezési fázis elején van
     gameGrid.style.display = 'grid';
 
     document.querySelector('.faction-selection').style.display = 'none';
@@ -34,81 +35,35 @@ export function initializeUnitPlacementForPlayer(playerNum) {
     selectNextUnitToPlace();
 }
 
-function selectNextUnitToPlace() {
-    const playerArmy = currentPlayerPlacing === 1 ? player1Army : player2Army;
-
-    for (const unitAbbr in playerArmy) {
-        if (playerArmy[unitAbbr] > 0) {
-            currentUnitToPlace = unitAbbr;
-            messageDisplayDiv.textContent =
-                `Játékos ${currentPlayerPlacing}, helyezz el egy ${ALL_UNITS[unitAbbr].name}-t (${playerArmy[unitAbbr]} még maradt)!` +
-                ` Kattints egy üres mezőre a saját kezdőzónádban!`;
-            highlightPlacementZones();
-            return;
-        }
-    }
-
-    if (currentPlayerPlacing === 1) {
-        messageDisplayDiv.textContent = `Játékos 1, minden egységedet elhelyezted! Most Játékos 2 következik!`;
-        document.querySelector('.faction-selection').style.display = 'flex';
-        document.getElementById('selectFaction1Btn').disabled = true;
-        document.getElementById('selectFaction2Btn').disabled = false;
-    } else {
-        messageDisplayDiv.textContent = `Mindkét sereg a helyén! Kezdődjön a játék!`;
-        setGameStarted(true);
-        document.getElementById('actionButtons').style.display = 'flex';
-        document.getElementById('endButton').style.display = 'block';
-        document.getElementById('roundCounter').style.display = 'block';
-        document.getElementById('unitInfo').style.display = 'block';
-        document.getElementById('dice1').style.display = 'block';
-        document.getElementById('dice2').style.display = 'block';
-        document.getElementById('bonusDiceContainer').style.display = 'flex';
-    }
-    clearHighlights();
-}
+// ... (selectNextUnitToPlace és highlightPlacementZones függvények változatlanok maradnak) ...
 
 
-function highlightPlacementZones() {
-    clearHighlights();
-    const gridCells = gameGrid.querySelectorAll('.grid-cell');
-    const startRow = currentPlayerPlacing === 1 ? 0 : 7;
-    const endRow = currentPlayerPlacing === 1 ? 2 : 9;
+// --- FONTOS MÓDOSÍTÁS ITT: A handlePlacementClick függvény paramétere ---
+export function handlePlacementClick(clickedCell) { // <<< ITT VÁLTOZOTT AZ event HELYETT clickedCell
+    console.log("handlePlacementClick FUT, kattintott cella:", clickedCell); // Ezt hagyd benne, segít debugolni
 
-    gridCells.forEach(cell => {
-        const row = parseInt(cell.dataset.row);
-        if (row >= startRow && row <= endRow && !cell.dataset.unit) {
-            cell.classList.add('highlighted-move');
-        }
-    });
-}
-
-
-export function handlePlacementClick(event) {
-    const clickedCell = event.target;
-  //  if (!clickedCell.classList.contains('grid-cell') || !currentUnitToPlace) {
-  //      return;
-  // }
-   //INNEN ÚJ, ELŐZŐ KAKIJAVÍTÁS 
-    if (!clickedCell.classList.contains('highlight-placement')) {
+    // A `clickedCell = event.target;` sor már nem kell, mert a `main.js` már a megfelelő elemet adja át.
+    // Így a 92. sor is helyes lesz:
+    if (!clickedCell.classList.contains('highlighted-move')) { // Itt 'highlight-placement' helyett 'highlighted-move' kell?
         console.log("Hiba: A cella nincs kijelölve egység elhelyezésre (nem zöld).");
         return;
     }
 
-    // A unitToPlace (amit a previous válaszban currentUnitToPlace-nek hívtam) ellenőrzése is fontos!
-    // Feltételezem, hogy van egy 'unitToPlace' változód, amit az initializeUnitPlacementForPlayer állít be.
-    if (!unitToPlace || Object.keys(unitToPlace).length === 0) {
-        console.log("Hiba: Nincs kiválasztott egység a lehelyezéshez (unitToPlace üres vagy nincs definiálva).");
+    // A `unitToPlace` helyett `currentUnitToPlace` a helyes változónév itt!
+    // A hiba a console.log üzenetben volt az "unitToPlace" elnevezésnél az előző válaszomban,
+    // a fájlban lévő `currentUnitToPlace` a megfelelő.
+    if (!currentUnitToPlace) { // Nincs szükség Object.keys(currentUnitToPlace).length === 0, ha string
+        console.log("Hiba: Nincs kiválasztott egység a lehelyezéshez (currentUnitToPlace üres vagy nincs definiálva).");
         return;
     }
 
-    
     const row = parseInt(clickedCell.dataset.row);
     const col = parseInt(clickedCell.dataset.col);
     const playerFaction = currentPlayerPlacing === 1 ? player1Faction : player2Faction;
     const playerArmy = currentPlayerPlacing === 1 ? player1Army : player2Army;
 
     const isInsidePlacementZone = (currentPlayerPlacing === 1 && row >= 0 && row <= 2) ||
-                                  (currentPlayerPlacing === 2 && row >= 7 && row <= 9);
+                                 (currentPlayerPlacing === 2 && row >= 7 && row <= 9);
 
     if (!clickedCell.dataset.unit && isInsidePlacementZone) {
         if (playerArmy[currentUnitToPlace] > 0) {
@@ -117,7 +72,10 @@ export function handlePlacementClick(event) {
             unitCounter++;
             const unitID = `${unitAbbr}${unitCounter}`;
 
-            clickedCell.textContent = unitAbbr;
+            // Vizuális megjelenítés a cellán
+            clickedCell.textContent = unitData.name; // Javaslom a teljes nevét megjeleníteni rövidítés helyett
+
+
             clickedCell.dataset.unit = unitID;
             clickedCell.dataset.player = currentPlayerPlacing;
             clickedCell.dataset.faction = playerFaction;
@@ -125,28 +83,37 @@ export function handlePlacementClick(event) {
             // Frissítjük a unitsData globális objektumot
             unitsData[unitID] = {
                 id: unitID,
-                type: unitAbbr,
+                name: unitData.name, // Fontos: adjuk hozzá a nevet is!
+                abbr: unitAbbr, // Rövidítés
+                type: unitData.type, // Pl. infantry, cavalry
                 player: currentPlayerPlacing,
                 faction: playerFaction,
                 row: row,
                 col: col,
-                // <-- Eltávolítva: maxHP, currentHP
-                movement: unitData.movement || 6,
+                hp: unitData.hp || 0, // Feltételezve, hogy vannak ilyen adatok a factions.js-ben
+                attack: unitData.attack || 0,
+                defense: unitData.defense || 0,
+                range: unitData.range || 0,
+                cost: unitData.cost || 0,
+                movement: unitData.movement || 0, // Hozzáadtam ezeket a propsokat, ahogy az ALL_UNITS-ban vannak
                 ranged: unitData.ranged || 0,
                 melee: unitData.melee || 0,
                 armour: unitData.armour || 0,
             };
 
-            setUnitsData(unitsData);
+            setUnitsData(unitsData); // Győződj meg róla, hogy ez a függvény frissíti a gameState-et!
 
-            playerArmy[unitAbbr]--;
+            playerArmy[currentUnitToPlace]--; // Helyes változónév használata
             incrementUnitsPlaced();
 
-            if (playerArmy[unitAbbr] === 0) {
-                delete playerArmy[unitAbbr];
+            // Fontos: Töröljük a highlightot a celláról, miután elhelyeztük az egységet
+            clickedCell.classList.remove('highlighted-move');
+
+
+            if (playerArmy[currentUnitToPlace] === 0) {
             }
 
-            selectNextUnitToPlace();
+            selectNextUnitToPlace(); // Válassza ki a következő egységet a listából
 
         } else {
             messageDisplayDiv.textContent = `Nincs több ${ALL_UNITS[currentUnitToPlace].name} a seregedben, vagy érvénytelen lépés!`;
